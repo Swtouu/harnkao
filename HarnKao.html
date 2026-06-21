@@ -4,11 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HarnKao — Trip Expense Splitter</title>
+<meta name="description" content="หารข้าว — Split trip expenses with friends">
+<meta name="theme-color" content="#7B5EA7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HarnKao">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" href="/Harnkao.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════
-   LIGHT THEME  (PANTONE 14-3812 TCX Pastel Lilac)
+   LIGHT THEME
 ══════════════════════════════════════════ */
 :root {
   --bg:           #F9F7FC;
@@ -88,9 +96,7 @@
    BASE
 ══════════════════════════════════════════ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 html { transition: background 0.3s; }
-
 body {
   font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
@@ -110,7 +116,7 @@ header {
   transition: background 0.3s;
 }
 .header-inner {
-  max-width: 840px; margin: 0 auto;
+  max-width: 860px; margin: 0 auto;
   padding: 0.9rem 1.25rem;
   display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
 }
@@ -124,10 +130,8 @@ header {
 }
 .logo-text h1 { font-size: 1.15rem; font-weight: 600; color: #fff; letter-spacing: -0.02em; line-height: 1.2; }
 .logo-text p  { font-size: 0.74rem; color: rgba(255,255,255,0.7); font-weight: 300; }
-
 .header-actions { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
 
-/* Currency pill */
 .currency-pill {
   background: rgba(255,255,255,0.15);
   border: 1px solid rgba(255,255,255,0.25);
@@ -143,7 +147,6 @@ header {
 }
 .currency-pill select option { background: #3D2F55; color: #fff; }
 
-/* Theme toggle */
 .theme-toggle {
   background: rgba(255,255,255,0.15);
   border: 1px solid rgba(255,255,255,0.25);
@@ -177,8 +180,8 @@ header {
    MAIN LAYOUT
 ══════════════════════════════════════════ */
 .main {
-  max-width: 840px; margin: 0 auto;
-  padding: 1.5rem 1rem 5rem;
+  max-width: 860px; margin: 0 auto;
+  padding: 1.5rem 1rem 6rem;
   display: flex; flex-direction: column; gap: 1rem;
 }
 
@@ -188,6 +191,7 @@ header {
   display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.55rem;
 }
 .section-eyebrow::after { content:''; flex:1; height:1px; background:var(--border-soft); }
+.eyebrow-actions { display: flex; gap: 0.4rem; margin-left: 0.5rem; }
 
 /* ══════════════════════════════════════════
    CARDS
@@ -200,6 +204,24 @@ header {
   box-shadow: var(--card-shadow);
   transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
+
+/* ══════════════════════════════════════════
+   TRIP INFO
+══════════════════════════════════════════ */
+.trip-info-row {
+  display: flex; align-items: flex-end; gap: 0.75rem; flex-wrap: wrap;
+}
+.trip-name-group { flex: 2; min-width: 180px; }
+.trip-date-group { flex: 2; min-width: 220px; }
+.field-label {
+  display: block; font-size: 0.68rem; font-weight: 600;
+  color: var(--text-hint); text-transform: uppercase;
+  letter-spacing: 0.08em; margin-bottom: 0.28rem;
+}
+.date-range-row { display: flex; align-items: center; gap: 0.4rem; }
+.date-range-row input[type=date] { flex: 1; min-width: 0; }
+.date-to { color: var(--text-hint); font-size: 0.85rem; flex-shrink: 0; }
+.trips-btn { flex-shrink: 0; }
 
 /* ══════════════════════════════════════════
    PEOPLE
@@ -227,10 +249,9 @@ header {
   transition: color 0.1s;
 }
 .remove-btn:hover { color: var(--negative); }
-
 .input-row { display: flex; gap: 0.45rem; }
 
-input[type=text], input[type=number], select {
+input[type=text], input[type=number], input[type=date], select {
   padding: 0.55rem 0.8rem;
   border: 1.5px solid var(--border-soft);
   border-radius: var(--radius);
@@ -240,7 +261,7 @@ input[type=text], input[type=number], select {
   transition: border-color 0.15s, box-shadow 0.15s, background 0.3s, color 0.3s;
   -webkit-appearance: none;
 }
-input[type=text]:focus, input[type=number]:focus, select:focus {
+input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, select:focus {
   border-color: var(--lilac-deep);
   box-shadow: 0 0 0 3px rgba(160,144,186,0.2);
 }
@@ -256,26 +277,24 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
   white-space: nowrap;
 }
 .btn:active { transform: scale(0.96); }
-
 .btn-primary {
   background: linear-gradient(135deg, var(--grad-a), var(--grad-b));
   color: #fff; box-shadow: 0 2px 8px rgba(123,94,167,0.35);
 }
 .btn-primary:hover { opacity: 0.9; box-shadow: 0 4px 14px rgba(123,94,167,0.45); }
-
 .btn-soft {
   background: var(--surface2); color: var(--lilac-dark);
   border: 1.5px solid var(--border);
 }
 .btn-soft:hover { background: var(--surface3); }
 [data-theme="dark"] .btn-soft { color: var(--lilac-dark); }
-
 .btn-danger {
   background: var(--negative-bg); color: var(--negative);
   border: 1px solid var(--negative-border);
 }
 .btn-danger:hover { filter: brightness(1.08); }
 .btn-icon { padding: 0.45rem 0.55rem; border-radius: 10px; }
+.btn-xs { padding: 0.22rem 0.6rem; font-size: 0.76rem; border-radius: 8px; }
 
 /* ══════════════════════════════════════════
    EXPENSE ITEMS
@@ -289,7 +308,7 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
 .expense-item:hover { border-color: var(--border); box-shadow: 0 3px 10px rgba(90,60,140,0.08); }
 [data-theme="dark"] .expense-item:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.3); }
 
-.expense-header { display: flex; align-items: flex-start; gap: 0.6rem; margin-bottom: 0.7rem; }
+.expense-header { display: flex; align-items: flex-start; gap: 0.6rem; margin-bottom: 0.6rem; }
 .expense-index {
   font-size: 0.66rem; font-weight: 700; color: var(--text-hint);
   background: var(--surface); border: 1px solid var(--border-soft);
@@ -302,13 +321,37 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
   padding: 0.44rem 0.66rem; font-size: 0.85rem; border-radius: 10px;
 }
 .field-desc { flex:2; min-width: 120px; }
-.field-amount { width: 110px; }
-.field-payer { min-width: 98px; flex:1; }
+.field-amount { width: 100px; }
+.field-currency { width: 78px; padding-left: 0.45rem !important; }
+.field-date { width: 140px; font-size: 0.83rem !important; }
+.field-payer { min-width: 95px; flex:1; }
 
+/* Amount + currency grouped */
+.amount-cur-wrap { display: flex; gap: 0.3rem; align-items: center; }
+
+/* Split mode */
+.split-section { margin-top: 0.55rem; }
+.split-mode-row {
+  display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.4rem;
+}
 .split-label {
   font-size: 0.66rem; font-weight: 600; color: var(--text-hint);
-  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.38rem;
+  text-transform: uppercase; letter-spacing: 0.08em;
 }
+.split-mode-btn {
+  padding: 0.15rem 0.6rem; border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--surface); color: var(--text-muted);
+  font-size: 0.73rem; font-weight: 600; cursor: pointer;
+  font-family: inherit; transition: all 0.12s;
+}
+.split-mode-btn.active {
+  background: linear-gradient(135deg, rgba(123,94,167,0.12), rgba(160,144,186,0.16));
+  border-color: var(--lilac-deep); color: var(--lilac-darker);
+}
+[data-theme="dark"] .split-mode-btn.active { color: var(--lilac-dark); }
+
+/* Equal split toggles */
 .split-people { display: flex; flex-wrap: wrap; gap: 0.3rem; }
 .split-toggle {
   display: flex; align-items: center; gap: 0.28rem;
@@ -322,11 +365,33 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
   background: linear-gradient(135deg, rgba(123,94,167,0.1), rgba(160,144,186,0.14));
   border-color: var(--lilac-deep); color: var(--lilac-darker);
 }
-[data-theme="dark"] .split-toggle.active {
-  background: rgba(150,120,200,0.18);
-  color: var(--lilac-dark);
+[data-theme="dark"] .split-toggle.active { background: rgba(150,120,200,0.18); color: var(--lilac-dark); }
+
+/* Custom amounts */
+.custom-amounts-grid { display: flex; flex-direction: column; gap: 0.28rem; margin-top: 0.1rem; }
+.custom-amount-row { display: flex; align-items: center; gap: 0.5rem; }
+.custom-amount-row .person-cell { flex: 1; min-width: 70px; font-size: 0.82rem; font-weight: 500; }
+.custom-amount-input {
+  width: 100px; text-align: right;
+  padding: 0.28rem 0.5rem !important; border-radius: 8px !important;
+  font-size: 0.83rem !important; background: var(--surface) !important;
+}
+.custom-cur-lbl { font-size: 0.74rem; color: var(--text-muted); min-width: 28px; }
+.custom-total-bar {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.28rem 0 0; border-top: 1px solid var(--border-soft);
+  margin-top: 0.25rem; font-size: 0.76rem; color: var(--text-hint); font-weight: 500;
+}
+.total-match { color: var(--positive); font-weight: 700; }
+.total-mismatch { color: var(--negative); font-weight: 700; }
+.total-diff { color: var(--negative); font-size: 0.71rem; margin-left: auto; }
+.rate-missing-warn {
+  font-size: 0.72rem; color: var(--warning);
+  background: var(--warning-bg); border: 1px solid var(--warning-border);
+  border-radius: 8px; padding: 0.18rem 0.55rem; display: inline-flex; align-items: center; gap: 0.3rem;
 }
 
+/* Expense footer */
 .expense-footer {
   display: flex; align-items: center; justify-content: space-between;
   margin-top: 0.55rem; padding-top: 0.55rem;
@@ -368,10 +433,7 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
   background: linear-gradient(135deg, var(--grad-a), var(--grad-b));
   border-color: transparent;
 }
-.stat-label {
-  font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--text-hint); margin-bottom: 0.18rem; font-weight: 600;
-}
+.stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-hint); margin-bottom: 0.18rem; font-weight: 600; }
 .accent-stat .stat-label { color: rgba(255,255,255,0.72); }
 .stat-value { font-size: 1.28rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
 .accent-stat .stat-value { color: #fff; }
@@ -395,21 +457,33 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
 .amount-zero { color: var(--text-hint); }
 .converted-sub { display: block; font-size: 0.7rem; color: var(--text-hint); font-weight: 400; }
 
+/* Settlement list */
 .settlement-list { list-style: none; display: flex; flex-direction: column; gap: 0.45rem; }
-.settlement-list li {
+.settle-item {
   display: flex; align-items: center; gap: 0.45rem;
   padding: 0.58rem 0.85rem; border-radius: 12px; font-size: 0.85rem;
   background: var(--warning-bg); border: 1px solid var(--warning-border);
-  flex-wrap: wrap; transition: background 0.3s;
+  flex-wrap: wrap; transition: background 0.3s, opacity 0.2s;
 }
+.settle-item.settled { opacity: 0.5; }
+.settle-item.settled .settle-amount { text-decoration: line-through; }
 .arrow-icon { color: var(--warning); flex-shrink: 0; }
 .settle-amount {
-  margin-left: auto; font-weight: 700; color: var(--warning);
+  font-weight: 700; color: var(--warning);
   background: rgba(154,112,64,0.12); border-radius: 100px;
   padding: 0.1rem 0.55rem; font-size: 0.83rem;
 }
 [data-theme="dark"] .settle-amount { background: rgba(200,152,80,0.18); }
 .settle-converted { font-size: 0.72rem; color: var(--text-muted); }
+.settle-done-btn {
+  margin-left: auto; padding: 0.18rem 0.6rem; border-radius: 100px;
+  border: 1.5px solid var(--border); background: var(--surface);
+  color: var(--text-muted); font-size: 0.72rem; font-weight: 600;
+  cursor: pointer; font-family: inherit; transition: all 0.12s; flex-shrink: 0;
+}
+.settle-done-btn.done {
+  background: var(--positive-bg); border-color: var(--positive-border); color: var(--positive);
+}
 
 .no-settle {
   padding: 0.8rem; border-radius: 12px;
@@ -417,6 +491,14 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
   font-size: 0.86rem; font-weight: 600; text-align: center;
   border: 1px solid var(--positive-border); transition: background 0.3s;
 }
+
+/* Export bar */
+.export-bar {
+  display: flex; align-items: center; gap: 0.45rem;
+  padding: 0.65rem 0 0.85rem; border-bottom: 1px solid var(--border-soft);
+  margin-bottom: 0.9rem;
+}
+.export-bar-label { font-size: 0.72rem; color: var(--text-hint); font-weight: 600; margin-right: auto; }
 
 .divider { height: 1px; background: var(--border-soft); margin: 0.95rem 0; }
 .empty-state { text-align: center; color: var(--text-hint); font-size: 0.85rem; padding: 1.4rem 0; }
@@ -428,6 +510,13 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
   border: 1px solid var(--border); transition: background 0.3s;
 }
 [data-theme="dark"] .badge { color: var(--lilac-dark); }
+
+.warn-banner {
+  background: var(--warning-bg); border: 1px solid var(--warning-border);
+  border-radius: var(--radius); padding: 0.55rem 0.9rem;
+  font-size: 0.8rem; color: var(--warning);
+  margin-bottom: 0.85rem;
+}
 
 /* ══════════════════════════════════════════
    FAB & TOAST
@@ -457,31 +546,7 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ══════════════════════════════════════════
-   AVATAR COLORS — light / dark variants
-══════════════════════════════════════════ */
-.av0 { background:#E8DFFE; color:#4A2E9E; }
-.av1 { background:#D6EEFF; color:#0C4F8E; }
-.av2 { background:#FFE4F0; color:#8E1A4E; }
-.av3 { background:#D6F5E9; color:#1A6644; }
-.av4 { background:#FFF3D6; color:#8E5A00; }
-.av5 { background:#FFE0E0; color:#8E2020; }
-.av6 { background:#D6F0FF; color:#1A5A8E; }
-.av7 { background:#F0FFD6; color:#4A7A1A; }
-
-[data-theme="dark"] .av0 { background:#2E1E5A; color:#C0A8F8; }
-[data-theme="dark"] .av1 { background:#102040; color:#80C0FF; }
-[data-theme="dark"] .av2 { background:#3A1028; color:#F0A0C0; }
-[data-theme="dark"] .av3 { background:#0E2E1E; color:#70D090; }
-[data-theme="dark"] .av4 { background:#2E2008; color:#E0C070; }
-[data-theme="dark"] .av5 { background:#2E0E0E; color:#F08080; }
-[data-theme="dark"] .av6 { background:#0E2030; color:#70C0F0; }
-[data-theme="dark"] .av7 { background:#1E2E08; color:#A0D060; }
-
-/* ══════════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════════ */
-/* ══════════════════════════════════════════
-   SHARE MODAL
+   SHARE / TRIPS MODALS
 ══════════════════════════════════════════ */
 .modal-backdrop {
   position: fixed; inset: 0; z-index: 300;
@@ -499,7 +564,7 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
   border-radius: var(--radius-lg);
   width: 100%; max-width: 440px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  overflow: hidden;
+  overflow: hidden; max-height: 90vh; overflow-y: auto;
   animation: slideUp 0.18s ease;
   transition: background 0.3s;
 }
@@ -509,6 +574,7 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
   display: flex; align-items: center; justify-content: space-between;
   padding: 1rem 1.25rem 0.85rem;
   border-bottom: 1px solid var(--border-soft);
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
 }
 .modal-title {
   display: flex; align-items: center; gap: 0.5rem;
@@ -524,10 +590,7 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
 .modal-close:hover { background: var(--surface3); color: var(--text); }
 
 .modal-section { padding: 1rem 1.25rem; }
-.modal-section-label {
-  font-size: 0.78rem; font-weight: 600; color: var(--text);
-  margin-bottom: 0.35rem;
-}
+.modal-section-label { font-size: 0.78rem; font-weight: 600; color: var(--text); margin-bottom: 0.35rem; }
 .modal-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.75rem; }
 .modal-divider { height: 1px; background: var(--border-soft); }
 
@@ -546,20 +609,58 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
   background: var(--surface2); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 0.45rem 0.6rem;
 }
-.share-url-text {
-  flex: 1; font-size: 0.76rem; color: var(--text-muted);
-  word-break: break-all; font-family: monospace;
-}
-.share-hint {
-  font-size: 0.76rem; color: var(--text-hint); margin-top: 0.3rem; line-height: 1.5;
-}
+.share-url-text { flex: 1; font-size: 0.76rem; color: var(--text-muted); word-break: break-all; font-family: monospace; }
+.share-hint { font-size: 0.76rem; color: var(--text-hint); margin-top: 0.3rem; line-height: 1.5; }
 
-@media (max-width: 520px) {
+/* Trips list */
+.trips-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.trip-list-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.75rem; border-radius: var(--radius);
+  border: 1.5px solid var(--border-soft);
+  background: var(--surface2); transition: all 0.12s;
+}
+.trip-list-item.active { border-color: var(--lilac-deep); background: var(--lilac-xlight); }
+.trip-list-item:not(.active):hover { border-color: var(--border); }
+.trip-list-info { flex: 1; min-width: 0; }
+.trip-list-name { font-size: 0.88rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trip-list-meta { font-size: 0.72rem; color: var(--text-hint); }
+.trip-list-actions { display: flex; align-items: center; gap: 0.4rem; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════
+   AVATAR COLORS
+══════════════════════════════════════════ */
+.av0 { background:#E8DFFE; color:#4A2E9E; }
+.av1 { background:#D6EEFF; color:#0C4F8E; }
+.av2 { background:#FFE4F0; color:#8E1A4E; }
+.av3 { background:#D6F5E9; color:#1A6644; }
+.av4 { background:#FFF3D6; color:#8E5A00; }
+.av5 { background:#FFE0E0; color:#8E2020; }
+.av6 { background:#D6F0FF; color:#1A5A8E; }
+.av7 { background:#F0FFD6; color:#4A7A1A; }
+[data-theme="dark"] .av0 { background:#2E1E5A; color:#C0A8F8; }
+[data-theme="dark"] .av1 { background:#102040; color:#80C0FF; }
+[data-theme="dark"] .av2 { background:#3A1028; color:#F0A0C0; }
+[data-theme="dark"] .av3 { background:#0E2E1E; color:#70D090; }
+[data-theme="dark"] .av4 { background:#2E2008; color:#E0C070; }
+[data-theme="dark"] .av5 { background:#2E0E0E; color:#F08080; }
+[data-theme="dark"] .av6 { background:#0E2030; color:#70C0F0; }
+[data-theme="dark"] .av7 { background:#1E2E08; color:#A0D060; }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 560px) {
   .expense-fields { flex-direction: column; }
-  .field-amount, .field-payer { width: 100%; }
+  .field-amount, .field-payer, .field-date, .field-currency { width: 100%; }
+  .amount-cur-wrap { width: 100%; }
+  .amount-cur-wrap .field-amount { flex: 1; }
+  .amount-cur-wrap .field-currency { width: 78px; }
   .summary-grid { grid-template-columns: 1fr 1fr; }
   .summary-grid .stat-card:first-child { grid-column: 1/-1; }
   .logo-text p { display: none; }
+  .trip-info-row { flex-direction: column; }
+  .trip-name-group, .trip-date-group { width: 100%; }
 }
 </style>
 </head>
@@ -568,7 +669,7 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
 <header>
   <div class="header-inner">
     <div class="logo-block">
-      <div class="logo-icon">🍚</div>
+      <div class="logo-icon" style="padding:0;overflow:hidden"><img src="/Harnkao.png" alt="HarnKao" style="width:100%;height:100%;object-fit:cover;display:block"></div>
       <div class="logo-text">
         <h1>HarnKao</h1>
         <p>หารข้าว — Trip Expense Splitter</p>
@@ -603,6 +704,35 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
     <span class="dot dot-off" id="rate-dot"></span>
     <span id="rate-text">Loading rates…</span>
     <span class="rate-status" id="rate-status"></span>
+  </div>
+
+  <!-- Trip Info -->
+  <div>
+    <div class="section-eyebrow">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Trip Info
+    </div>
+    <div class="card">
+      <div class="trip-info-row">
+        <div class="trip-name-group">
+          <label class="field-label" for="trip-name-input">Trip name</label>
+          <input type="text" id="trip-name-input" placeholder="e.g. Chiang Mai Summer 2025" maxlength="60"
+            oninput="state.tripName=this.value;save()" style="width:100%" />
+        </div>
+        <div class="trip-date-group">
+          <label class="field-label">Dates</label>
+          <div class="date-range-row">
+            <input type="date" id="trip-date-start" oninput="state.tripDateStart=this.value;save()" />
+            <span class="date-to">→</span>
+            <input type="date" id="trip-date-end" oninput="state.tripDateEnd=this.value;save()" />
+          </div>
+        </div>
+        <button class="btn btn-soft trips-btn" onclick="showTripsModal()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          My Trips
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- People -->
@@ -670,7 +800,6 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
       </span>
       <button class="modal-close" onclick="hideShareModal()">×</button>
     </div>
-
     <div class="modal-section">
       <div class="modal-section-label">📤 Share with friends</div>
       <p class="modal-desc">Save your trip online and get a short ID or link to share.</p>
@@ -680,9 +809,7 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
       </button>
       <div id="share-result" style="margin-top:0.75rem"></div>
     </div>
-
     <div class="modal-divider"></div>
-
     <div class="modal-section">
       <div class="modal-section-label">📥 Load a shared trip</div>
       <p class="modal-desc">Got a Trip ID from a friend? Paste it below.</p>
@@ -694,15 +821,43 @@ input[type=text]:focus, input[type=number]:focus, select:focus {
   </div>
 </div>
 
+<!-- Trips modal -->
+<div id="trips-modal" style="display:none" class="modal-backdrop" onclick="if(event.target===this)hideTripsModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        My Trips
+      </span>
+      <button class="modal-close" onclick="hideTripsModal()">×</button>
+    </div>
+    <div class="modal-section" style="padding-bottom:0.75rem">
+      <button class="btn btn-primary" onclick="newTrip()" style="width:100%;justify-content:center">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Trip
+      </button>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-section">
+      <div class="trips-list" id="trips-list"></div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 /* ══════════════════════════════════════════
-   CURRENCY
+   CONSTANTS
 ══════════════════════════════════════════ */
-const SYM = { THB:'฿',USD:'$',EUR:'€',GBP:'£',JPY:'¥',CNY:'¥',SGD:'S$',KRW:'₩',AUD:'A$',HKD:'HK$',MYR:'RM',INR:'₹' };
-const NODEC = new Set(['JPY','KRW']);
+const SYM    = { THB:'฿',USD:'$',EUR:'€',GBP:'£',JPY:'¥',CNY:'¥',SGD:'S$',KRW:'₩',AUD:'A$',HKD:'HK$',MYR:'RM',INR:'₹' };
+const NODEC  = new Set(['JPY','KRW']);
+const CURRENCIES = ['THB','USD','EUR','GBP','JPY','CNY','SGD','KRW','AUD','HKD','MYR','INR'];
+const AV     = ['av0','av1','av2','av3','av4','av5','av6','av7'];
 
+/* ══════════════════════════════════════════
+   CURRENCY & RATES
+══════════════════════════════════════════ */
 let activeCurrency = 'THB';
 let rates = {};
 let rateSource = 'off';
@@ -715,7 +870,6 @@ async function fetchRates() {
   document.getElementById('rate-text').textContent = 'Fetching rates…';
   document.getElementById('rate-dot').className = 'dot dot-off';
 
-  // Try cache (< 1 hour)
   try {
     const c = JSON.parse(localStorage.getItem('hk_rates') || 'null');
     if (c && Date.now() - c.ts < 3600000) {
@@ -724,7 +878,6 @@ async function fetchRates() {
     }
   } catch(e){}
 
-  // Live fetch
   try {
     const res = await fetch('https://api.exchangerate-api.com/v4/latest/THB');
     if (!res.ok) throw new Error();
@@ -734,7 +887,6 @@ async function fetchRates() {
     updateRateBanner(); renderExpenses(); renderSummary();
   } catch(e) {
     if (rateSource !== 'cache') {
-      // Approximate fallback (mid-2025)
       rates = {USD:0.0278,EUR:0.0256,GBP:0.0219,JPY:4.19,CNY:0.201,
                SGD:0.0372,KRW:38.3,AUD:0.0431,HKD:0.217,MYR:0.128,INR:2.32,THB:1};
       rateSource = 'off';
@@ -760,6 +912,7 @@ function updateRateBanner() {
   else                           { dotEl.className='dot dot-off';   stEl.textContent='Approximate (offline)'; }
 }
 
+// Display-currency formatter (converts from THB to activeCurrency)
 function fmt(thb) {
   if (activeCurrency==='THB' || !rates[activeCurrency])
     return { primary: '฿'+thb.toFixed(2), secondary: null };
@@ -767,6 +920,13 @@ function fmt(thb) {
   const sym = SYM[activeCurrency]||activeCurrency;
   const dec = NODEC.has(activeCurrency) ? 0 : 2;
   return { primary: '฿'+thb.toFixed(2), secondary: sym+c.toFixed(dec) };
+}
+
+// Format amount in a specific currency
+function fmtCur(amount, currency) {
+  const sym = SYM[currency] || currency;
+  const dec = NODEC.has(currency) ? 0 : 2;
+  return sym + (parseFloat(amount)||0).toFixed(dec);
 }
 
 function onCurrencyChange(cur) {
@@ -798,16 +958,156 @@ function loadTheme() {
 /* ══════════════════════════════════════════
    STATE
 ══════════════════════════════════════════ */
-const AV = ['av0','av1','av2','av3','av4','av5','av6','av7'];
-let state = { people:[], expenses:[] };
+let state = {
+  id: '',
+  tripName: '',
+  tripDateStart: '',
+  tripDateEnd: '',
+  people: [],
+  expenses: [],
+  settledTransfers: []   // ['Name→Name'] strings
+};
 
-function getAv(name) { return AV[state.people.indexOf(name) % AV.length]; }
+function getAv(name) { const i=state.people.indexOf(name); return AV[((i%AV.length)+AV.length)%AV.length]; }
+function findExp(id) { return state.expenses.find(e=>e.id===id); }
 
 function avEl(name, size) {
   size = size||26;
   const fs = size < 22 ? '0.56rem' : '0.68rem';
   return `<div class="avatar ${getAv(name)}" style="width:${size}px;height:${size}px;font-size:${fs}">${name.trim().slice(0,2).toUpperCase()}</div>`;
 }
+
+/* ══════════════════════════════════════════
+   TRIPS MANAGEMENT
+══════════════════════════════════════════ */
+function genId() {
+  return 'trip_' + Math.random().toString(36).slice(2,9) + Date.now().toString(36);
+}
+
+function getTripsIdx() {
+  try { return JSON.parse(localStorage.getItem('hk_trips') || '[]'); } catch(e) { return []; }
+}
+
+function saveTripsIdx(idx) {
+  try { localStorage.setItem('hk_trips', JSON.stringify(idx)); } catch(e){}
+}
+
+function save() {
+  if (!state.id) state.id = genId();
+  try {
+    localStorage.setItem('hk_trip_'+state.id, JSON.stringify(state));
+    localStorage.setItem('hk_current', state.id);
+    let idx = getTripsIdx();
+    const i = idx.findIndex(t=>t.id===state.id);
+    const entry = {
+      id: state.id,
+      tripName: state.tripName||'Unnamed Trip',
+      tripDateStart: state.tripDateStart||'',
+      tripDateEnd: state.tripDateEnd||'',
+      updatedAt: Date.now(),
+      expenseCount: state.expenses.length,
+      peopleCount: state.people.length
+    };
+    if (i===-1) idx.push(entry); else idx[i]=entry;
+    saveTripsIdx(idx);
+  } catch(e){}
+}
+
+function migrateState(s) {
+  if (!s) s={};
+  if (!s.id)              s.id = genId();
+  if (!s.tripName)        s.tripName = '';
+  if (!s.tripDateStart)   s.tripDateStart = '';
+  if (!s.tripDateEnd)     s.tripDateEnd = '';
+  if (!s.settledTransfers) s.settledTransfers = [];
+  if (!s.people)          s.people = [];
+  if (!s.expenses)        s.expenses = [];
+  s.expenses.forEach(e=>{
+    if (!e.id)           e.id = Date.now()+Math.random();
+    if (!e.date)         e.date = '';
+    if (!e.currency)     e.currency = 'THB';
+    if (!('currencyRate' in e)) e.currencyRate = 1;
+    if (!e.splitMode)    e.splitMode = 'equal';
+    if (!e.customAmounts) e.customAmounts = {};
+    if (!e.splitWith)    e.splitWith = [];
+  });
+  return s;
+}
+
+function newTrip() {
+  state = migrateState({
+    id: genId(),
+    tripName: '',
+    people: [],
+    expenses: [],
+    settledTransfers: []
+  });
+  save();
+  syncTripInfoUI();
+  renderPeople(); renderExpenses(); renderSummary();
+  hideTripsModal();
+  showToast('New trip started!');
+}
+
+function switchTrip(id) {
+  try {
+    const raw = localStorage.getItem('hk_trip_'+id);
+    if (!raw) { showToast('Trip not found.'); return; }
+    state = migrateState(JSON.parse(raw));
+    localStorage.setItem('hk_current', id);
+    syncTripInfoUI();
+    renderPeople(); renderExpenses(); renderSummary();
+    hideTripsModal();
+    showToast('Loaded: '+(state.tripName||'Unnamed Trip'));
+  } catch(e) { showToast('Error loading trip.'); }
+}
+
+function deleteTrip(id) {
+  if (id===state.id) { showToast("Can't delete the active trip."); return; }
+  if (!confirm('Delete this trip? This cannot be undone.')) return;
+  saveTripsIdx(getTripsIdx().filter(t=>t.id!==id));
+  try { localStorage.removeItem('hk_trip_'+id); } catch(e){}
+  renderTripsModal();
+  showToast('Trip deleted.');
+}
+
+function syncTripInfoUI() {
+  const n=document.getElementById('trip-name-input');
+  const s=document.getElementById('trip-date-start');
+  const e=document.getElementById('trip-date-end');
+  if(n) n.value=state.tripName||'';
+  if(s) s.value=state.tripDateStart||'';
+  if(e) e.value=state.tripDateEnd||'';
+}
+
+function renderTripsModal() {
+  const idx = getTripsIdx().sort((a,b)=>b.updatedAt-a.updatedAt);
+  const el = document.getElementById('trips-list');
+  if (!el) return;
+  if (!idx.length) {
+    el.innerHTML = '<div class="empty-state">No saved trips yet.</div>';
+    return;
+  }
+  el.innerHTML = idx.map(t=>`
+    <div class="trip-list-item ${t.id===state.id?'active':''}">
+      <div class="trip-list-info">
+        <div class="trip-list-name">${esc(t.tripName||'Unnamed Trip')}</div>
+        <div class="trip-list-meta">${t.peopleCount} people · ${t.expenseCount} expenses${t.tripDateStart?' · '+t.tripDateStart:''}${t.tripDateEnd&&t.tripDateEnd!==t.tripDateStart?' – '+t.tripDateEnd:''}</div>
+      </div>
+      <div class="trip-list-actions">
+        ${t.id===state.id
+          ? '<span class="badge" style="background:var(--positive-bg);color:var(--positive);border-color:var(--positive-border)">Current</span>'
+          : `<button class="btn btn-soft btn-xs" onclick="switchTrip('${esc(t.id)}')">Load</button>
+             <button class="btn btn-danger btn-icon" onclick="deleteTrip('${esc(t.id)}')" title="Delete" style="padding:0.35rem 0.45rem">
+               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+             </button>`
+        }
+      </div>
+    </div>`).join('');
+}
+
+function showTripsModal() { renderTripsModal(); document.getElementById('trips-modal').style.display='flex'; }
+function hideTripsModal() { document.getElementById('trips-modal').style.display='none'; }
 
 /* ══════════════════════════════════════════
    PEOPLE
@@ -819,7 +1119,7 @@ function addPerson() {
   if (state.people.includes(name)) { showToast('Name already exists!'); return; }
   if (state.people.length>=8) { showToast('Max 8 people supported.'); return; }
   state.people.push(name);
-  inp.value = '';
+  inp.value='';
   renderPeople(); renderExpenses(); renderSummary(); save();
 }
 
@@ -829,7 +1129,9 @@ function removePerson(name) {
   state.expenses.forEach(e=>{
     e.splitWith = e.splitWith.filter(p=>p!==name);
     if (e.payer===name) e.payer='';
+    delete e.customAmounts[name];
   });
+  state.settledTransfers = [];
   renderPeople(); renderExpenses(); renderSummary(); save();
 }
 
@@ -843,7 +1145,7 @@ function renderPeople() {
     <div class="person-chip">
       ${avEl(n,24)}
       <span>${esc(n)}</span>
-      <button class="remove-btn" onclick="removePerson('${esc(n)}')" title="Remove">×</button>
+      <button class="remove-btn" data-name="${esc(n)}" onclick="removePerson(this.dataset.name)" title="Remove">×</button>
     </div>`).join('');
 }
 
@@ -851,25 +1153,45 @@ function renderPeople() {
    EXPENSES
 ══════════════════════════════════════════ */
 function addExpense() {
-  state.expenses.push({id:Date.now(), desc:'', amount:'', payer:state.people[0]||'', splitWith:[...state.people]});
+  state.expenses.push({
+    id: Date.now(),
+    desc: '',
+    date: '',
+    amount: '',
+    currency: 'THB',
+    currencyRate: 1,
+    payer: state.people[0]||'',
+    splitMode: 'equal',
+    splitWith: [...state.people],
+    customAmounts: {}
+  });
   renderExpenses(); renderSummary(); save();
 }
 
 function removeExpense(id) {
   state.expenses = state.expenses.filter(e=>e.id!==id);
+  state.settledTransfers = [];
   renderExpenses(); renderSummary(); save();
 }
 
 function updateExpense(id, field, value) {
-  const e = state.expenses.find(e=>e.id===id);
+  const e = findExp(id);
   if (!e) return;
   e[field] = value;
+
+  if (field==='currency') {
+    e.currencyRate = value==='THB' ? 1 : (rates[value]||null);
+  }
+
+  const balanceFields = new Set(['amount','currency','payer','splitWith']);
+  if (balanceFields.has(field)) state.settledTransfers = [];
+
   if (field==='amount'||field==='splitWith') rerenderFooter(id);
   renderSummary(); save();
 }
 
 function toggleSplit(id, name) {
-  const e = state.expenses.find(e=>e.id===id);
+  const e = findExp(id);
   if (!e) return;
   const idx = e.splitWith.indexOf(name);
   if (idx===-1) e.splitWith.push(name);
@@ -878,28 +1200,102 @@ function toggleSplit(id, name) {
   document.querySelectorAll('[data-expense="'+id+'"] .split-toggle').forEach(el=>{
     el.classList.toggle('active', e.splitWith.includes(el.dataset.name));
   });
+  state.settledTransfers = [];
   rerenderFooter(id); renderSummary(); save();
 }
 
-function rerenderFooter(id) {
-  const e = state.expenses.find(e=>e.id===id);
+function setSplitMode(id, mode) {
+  const e = findExp(id);
   if (!e) return;
-  const footer = document.querySelector('[data-expense="'+id+'"] .expense-footer');
-  if (!footer) return;
-  footer.innerHTML = footerHTML(e);
+  e.splitMode = mode;
+  if (mode==='custom' && state.people.length>0) {
+    const amt = parseFloat(e.amount)||0;
+    const members = e.splitWith.length>0 ? e.splitWith : state.people;
+    const share = members.length>0 && amt>0 ? (amt/members.length) : 0;
+    state.people.forEach(p=>{
+      if (!(p in e.customAmounts)) {
+        e.customAmounts[p] = members.includes(p) && share>0 ? share.toFixed(2) : '';
+      }
+    });
+  }
+  state.settledTransfers = [];
+  renderExpenses(); renderSummary(); save();
+}
+
+function updateCustomAmount(id, name, value) {
+  const e = findExp(id);
+  if (!e) return;
+  e.customAmounts[name] = value;
+  state.settledTransfers = [];
+  rerenderCustomTotal(id);
+  renderSummary(); save();
+}
+
+function rerenderCustomTotal(id) {
+  const e = findExp(id);
+  if (!e) return;
+  const el = document.querySelector('[data-expense="'+id+'"] .custom-total-bar');
+  if (el) el.innerHTML = customTotalHTML(e);
+}
+
+function customTotalHTML(e) {
+  const total = state.people.reduce((s,p)=>s+(parseFloat(e.customAmounts[p])||0), 0);
+  const amt = parseFloat(e.amount)||0;
+  const diff = total - amt;
+  const match = Math.abs(diff)<0.005;
+  const sym = SYM[e.currency]||e.currency;
+  const dec = NODEC.has(e.currency)?0:2;
+  return `<span>Total:</span>
+    <span class="${match?'total-match':'total-mismatch'}">${sym}${total.toFixed(dec)} / ${sym}${amt.toFixed(dec)}</span>
+    ${!match?`<span class="total-diff">${diff>0?'+':''}${sym}${diff.toFixed(dec)}</span>`:''}`;
+}
+
+function rerenderFooter(id) {
+  const e = findExp(id);
+  if (!e) return;
+  const el = document.querySelector('[data-expense="'+id+'"] .expense-footer');
+  if (el) el.innerHTML = footerHTML(e);
 }
 
 function footerHTML(e) {
   const amt = parseFloat(e.amount)||0;
-  const n   = e.splitWith.length;
-  const per = n>0 ? amt/n : 0;
-  const f   = fmt(per);
-  let html  = `<span>${n} sharing</span><div class="footer-amounts">`;
-  if (per>0) {
-    html += `<span class="per-person-pill">${f.primary} each</span>`;
-    if (f.secondary) html += `<span class="per-person-converted">${f.secondary}</span>`;
+  const sym = SYM[e.currency]||e.currency;
+  const dec = NODEC.has(e.currency)?0:2;
+
+  if (!amt) return `<span style="color:var(--text-hint)">Enter an amount</span><div class="footer-amounts"></div>`;
+
+  if (e.splitMode==='custom') {
+    const total = state.people.reduce((s,p)=>s+(parseFloat(e.customAmounts[p])||0), 0);
+    const match = Math.abs(total-amt)<0.005;
+    const cls = match?'amount-positive':'amount-negative';
+    return `<span>Custom split</span>
+      <div class="footer-amounts">
+        <span class="${cls}" style="font-size:0.78rem;font-weight:700">${sym}${total.toFixed(dec)} / ${sym}${amt.toFixed(dec)}</span>
+      </div>`;
   }
-  return html + '</div>';
+
+  const n = e.splitWith.length;
+  const per = n>0 ? amt/n : 0;
+  let html = `<span>${n} sharing</span><div class="footer-amounts">`;
+
+  if (per>0) {
+    html += `<span class="per-person-pill">${fmtCur(per,e.currency)} each</span>`;
+    // If expense is non-THB, show THB equivalent
+    if (e.currency!=='THB' && e.currencyRate && e.currencyRate>0) {
+      const perTHB = per/e.currencyRate;
+      html += `<span class="per-person-converted">≈ ฿${perTHB.toFixed(2)}</span>`;
+    }
+    // If display currency is different from THB and expense is THB, show conversion
+    if (e.currency==='THB' && activeCurrency!=='THB' && rates[activeCurrency]) {
+      const f = fmt(per);
+      if (f.secondary) html += `<span class="per-person-converted">${f.secondary}</span>`;
+    }
+  }
+  return html+'</div>';
+}
+
+function currencyOptionsHTML(selected) {
+  return CURRENCIES.map(c=>`<option value="${c}" ${c===selected?'selected':''}>${c}</option>`).join('');
 }
 
 function renderExpenses() {
@@ -908,15 +1304,23 @@ function renderExpenses() {
     list.innerHTML = '<div class="empty-state">No expenses yet — add one below.</div>';
     return;
   }
-  list.innerHTML = state.expenses.map((e,i) => `
+  list.innerHTML = state.expenses.map((e,i)=>`
     <div class="expense-item" data-expense="${e.id}">
       <div class="expense-header">
         <div class="expense-index">${i+1}</div>
         <div class="expense-fields">
           <input class="field-desc" type="text" placeholder="What was it?" value="${esc(e.desc)}"
-            onchange="state.expenses.find(x=>x.id==${e.id}).desc=this.value;renderSummary();save()" />
-          <input class="field-amount" type="number" placeholder="Amount (฿)" value="${esc(e.amount)}"
-            oninput="updateExpense(${e.id},'amount',this.value)" />
+            onchange="updateExpense(${e.id},'desc',this.value)" />
+          <div class="amount-cur-wrap">
+            <input class="field-amount" type="number" placeholder="Amount" value="${esc(e.amount)}"
+              oninput="updateExpense(${e.id},'amount',this.value)" />
+            <select class="field-currency" title="Expense currency"
+              onchange="updateExpense(${e.id},'currency',this.value);rerenderFooter(${e.id})">
+              ${currencyOptionsHTML(e.currency)}
+            </select>
+          </div>
+          <input class="field-date" type="date" value="${esc(e.date)}" title="Expense date"
+            onchange="updateExpense(${e.id},'date',this.value)" />
           <select class="field-payer" onchange="updateExpense(${e.id},'payer',this.value)">
             <option value="">— Paid by —</option>
             ${state.people.map(p=>`<option value="${esc(p)}" ${e.payer===p?'selected':''}>${esc(p)}</option>`).join('')}
@@ -926,66 +1330,123 @@ function renderExpenses() {
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
         </button>
       </div>
-      <div class="split-label">Split between</div>
-      <div class="split-people">
+
+      <div class="split-section">
+        <div class="split-mode-row">
+          <span class="split-label">Split</span>
+          <button class="split-mode-btn ${e.splitMode==='equal'?'active':''}"
+            onclick="setSplitMode(${e.id},'equal')">= Equal</button>
+          <button class="split-mode-btn ${e.splitMode==='custom'?'active':''}"
+            onclick="setSplitMode(${e.id},'custom')">$ Custom</button>
+          ${e.currency!=='THB'&&!e.currencyRate?`<span class="rate-missing-warn">⚠ Rate unavailable</span>`:''}
+        </div>
+
         ${state.people.length===0
           ? '<span style="font-size:0.79rem;color:var(--text-hint)">Add people first</span>'
-          : state.people.map(p=>`
-            <div class="split-toggle ${e.splitWith.includes(p)?'active':''}" data-name="${esc(p)}"
-              onclick="toggleSplit(${e.id},'${esc(p)}')">${avEl(p,16)} ${esc(p)}</div>`).join('')}
+          : e.splitMode==='equal'
+            ? `<div class="split-people">
+                ${state.people.map(p=>`
+                  <div class="split-toggle ${e.splitWith.includes(p)?'active':''}" data-name="${esc(p)}" data-id="${e.id}"
+                    onclick="toggleSplit(+this.dataset.id,this.dataset.name)">${avEl(p,16)} ${esc(p)}</div>`).join('')}
+               </div>`
+            : `<div class="custom-amounts-grid">
+                ${state.people.map(p=>`
+                  <div class="custom-amount-row">
+                    <div class="person-cell">${avEl(p,18)} ${esc(p)}</div>
+                    <input class="custom-amount-input" type="number" placeholder="0"
+                      value="${esc(e.customAmounts[p]||'')}"
+                      data-id="${e.id}" data-person="${esc(p)}"
+                      oninput="updateCustomAmount(+this.dataset.id,this.dataset.person,this.value)" />
+                    <span class="custom-cur-lbl">${SYM[e.currency]||e.currency}</span>
+                  </div>`).join('')}
+                <div class="custom-total-bar">${customTotalHTML(e)}</div>
+               </div>`
+        }
       </div>
+
       <div class="expense-footer">${footerHTML(e)}</div>
     </div>`).join('');
 }
 
 /* ══════════════════════════════════════════
-   SUMMARY  ← corrected logic
-   For each expense:
-     • payer gets credited the full amount
-     • every person in splitWith gets debited (amount / splitWith.length)
-   net[p] = totalPaid[p] - totalOwed[p]
-   positive net → others owe them
-   negative net → they owe others
+   SUMMARY
 ══════════════════════════════════════════ */
+function toggleSettled(from, to) {
+  const key = from+'→'+to;
+  const idx = state.settledTransfers.indexOf(key);
+  if (idx===-1) state.settledTransfers.push(key);
+  else state.settledTransfers.splice(idx,1);
+  renderSummary(); save();
+}
+
 function renderSummary() {
   const el = document.getElementById('summary-content');
-  if (!state.people.length || !state.expenses.length) {
+  if (!state.people.length||!state.expenses.length) {
     el.innerHTML = '<div class="empty-state">Add people and expenses to see the summary.</div>';
     return;
   }
 
-  const totalSpent = state.expenses.reduce((s,e)=>s+(parseFloat(e.amount)||0), 0);
-  const valid = state.expenses.filter(e => e.payer && parseFloat(e.amount)>0 && e.splitWith.length>0);
-
-  // Initialise
   const paid = {}, owed = {};
-  state.people.forEach(p => { paid[p]=0; owed[p]=0; });
+  state.people.forEach(p=>{ paid[p]=0; owed[p]=0; });
 
-  // Accumulate — each expense independently
-  valid.forEach(e => {
-    const amt   = parseFloat(e.amount);
-    const share = amt / e.splitWith.length;  // equal share among splitWith
+  const allExpenses = state.expenses.filter(e=>e.payer&&state.people.includes(e.payer)&&parseFloat(e.amount)>0);
+  let rateWarnings = [];
 
-    // Payer fronted the whole expense
-    paid[e.payer] = (paid[e.payer]||0) + amt;
+  allExpenses.forEach(e=>{
+    const rate = e.currency==='THB' ? 1 : e.currencyRate;
+    if (!rate||rate<=0) {
+      rateWarnings.push(e.desc||'#'+(state.expenses.indexOf(e)+1));
+      return;
+    }
+    const amtTHB = parseFloat(e.amount)/rate;
+    paid[e.payer] += amtTHB;
 
-    // Each person in splitWith owes their share
-    e.splitWith.forEach(p => { owed[p] = (owed[p]||0) + share; });
+    if (e.splitMode==='equal') {
+      const members = e.splitWith.filter(p=>state.people.includes(p));
+      if (members.length>0) {
+        const share = amtTHB/members.length;
+        members.forEach(p=>{ owed[p]+=share; });
+      }
+    } else {
+      state.people.forEach(p=>{
+        const personTHB = (parseFloat(e.customAmounts[p])||0)/rate;
+        owed[p] += personTHB;
+      });
+    }
   });
 
-  // Net balance: positive = others owe you, negative = you owe others
   const balance = {};
-  state.people.forEach(p => { balance[p] = (paid[p]||0) - (owed[p]||0); });
-
+  state.people.forEach(p=>{ balance[p]=(paid[p]||0)-(owed[p]||0); });
   const settlements = computeSettlements({...balance});
+
+  const totalSpent = allExpenses.reduce((s,e)=>{
+    const rate = e.currency==='THB' ? 1 : e.currencyRate;
+    if (!rate||rate<=0) return s;
+    return s + parseFloat(e.amount)/rate;
+  }, 0);
+
   const f = fmt(totalSpent);
 
   el.innerHTML = `
+    ${rateWarnings.length?`<div class="warn-banner">⚠️ Exchange rate unavailable for: ${rateWarnings.map(esc).join(', ')}. These expenses are excluded from the settlement.</div>`:''}
+
+    <div class="export-bar">
+      <span class="export-bar-label">Export</span>
+      <button class="btn btn-soft btn-xs" onclick="exportPDF()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        PDF
+      </button>
+      <button class="btn btn-soft btn-xs" onclick="exportPNG()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        PNG
+      </button>
+    </div>
+
     <div class="summary-grid">
       <div class="stat-card accent-stat">
         <div class="stat-label">Total spent</div>
         <div class="stat-value">${f.primary}</div>
-        ${f.secondary ? `<div class="stat-converted">${f.secondary}</div>` : ''}
+        ${f.secondary?`<div class="stat-converted">${f.secondary}</div>`:''}
       </div>
       <div class="stat-card">
         <div class="stat-label">Expenses</div>
@@ -1002,22 +1463,16 @@ function renderSummary() {
     <table class="balance-table">
       <thead><tr><th>Person</th><th>Paid</th><th>Owes (share)</th><th>Net</th></tr></thead>
       <tbody>
-        ${state.people.map(p => {
+        ${state.people.map(p=>{
           const net = balance[p];
           const cls = net>0.005?'amount-positive':net<-0.005?'amount-negative':'amount-zero';
-          const lbl = net>0.005 ? '+'+fmt(net).primary : net<-0.005 ? '-'+fmt(Math.abs(net)).primary : fmt(0).primary;
-          const fp = fmt(paid[p]||0);
-          const fo = fmt(owed[p]||0);
+          const lbl = net>0.005?'+'+fmt(net).primary:net<-0.005?'−'+fmt(Math.abs(net)).primary:fmt(0).primary;
+          const fp=fmt(paid[p]||0), fo=fmt(owed[p]||0);
           return `<tr>
             <td><div class="person-cell">${avEl(p,24)}<span>${esc(p)}</span></div></td>
-            <td>${fp.primary}${fp.secondary?`<span class="converted-sub">${fp.secondary}</span>`:''}
-            </td>
-            <td>${fo.primary}${fo.secondary?`<span class="converted-sub">${fo.secondary}</span>`:''}
-            </td>
-            <td class="${cls}">${lbl}${(() => {
-              const fn = fmt(Math.abs(net));
-              return fn.secondary ? `<span class="converted-sub">${fn.secondary}</span>` : '';
-            })()}</td>
+            <td>${fp.primary}${fp.secondary?`<span class="converted-sub">${fp.secondary}</span>`:''}</td>
+            <td>${fo.primary}${fo.secondary?`<span class="converted-sub">${fo.secondary}</span>`:''}</td>
+            <td class="${cls}">${lbl}${(()=>{const fn=fmt(Math.abs(net));return fn.secondary?`<span class="converted-sub">${fn.secondary}</span>`:''})()}</td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -1027,34 +1482,53 @@ function renderSummary() {
     <div class="section-eyebrow" style="margin-bottom:0.65rem">Who pays whom</div>
     ${settlements.length===0
       ? '<div class="no-settle">✓ All settled up! No transfers needed.</div>'
-      : `<ul class="settlement-list">${settlements.map(s => {
-          const fs = fmt(s.amount);
-          return `<li>
+      : `<ul class="settlement-list">${settlements.map(s=>{
+          const key = s.from+'→'+s.to;
+          const settled = state.settledTransfers.includes(key);
+          const fs=fmt(s.amount);
+          return `<li class="settle-item${settled?' settled':''}">
             <div class="person-cell" style="flex:none">${avEl(s.from,22)}<strong>${esc(s.from)}</strong></div>
             <svg class="arrow-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             <div class="person-cell" style="flex:none">${avEl(s.to,22)}<strong>${esc(s.to)}</strong></div>
             <span class="settle-amount">${fs.primary}</span>
             ${fs.secondary?`<span class="settle-converted">${fs.secondary}</span>`:''}
+            <button class="settle-done-btn${settled?' done':''}" data-from="${esc(s.from)}" data-to="${esc(s.to)}" onclick="toggleSettled(this.dataset.from,this.dataset.to)">
+              ${settled?'✓ Paid':'Mark paid'}
+            </button>
           </li>`;
-        }).join('')}</ul>`}
+        }).join('')}</ul>`
+    }
 
     <div class="divider"></div>
     <div class="section-eyebrow" style="margin-bottom:0.65rem">Expense breakdown</div>
     <table class="balance-table">
       <thead><tr><th>#</th><th>Item</th><th>Amount</th><th>Paid by</th><th>Shared by</th><th>Per person</th></tr></thead>
       <tbody>
-        ${state.expenses.map((e,i) => {
-          const amt = parseFloat(e.amount)||0;
-          const per = e.splitWith.length>0 ? amt/e.splitWith.length : 0;
-          const fa  = fmt(amt);
-          const fp2 = fmt(per);
+        ${state.expenses.map((e,i)=>{
+          const amt=parseFloat(e.amount)||0;
+          const sym=SYM[e.currency]||e.currency;
+          const dec=NODEC.has(e.currency)?0:2;
+          const rate=e.currency==='THB'?1:e.currencyRate;
+          const amtTHB=rate&&rate>0?amt/rate:null;
+
+          let perCell='—';
+          if (e.splitMode==='equal'&&e.splitWith.length>0&&amt>0) {
+            const per=amt/e.splitWith.length;
+            perCell=`<span class="badge">${sym}${per.toFixed(dec)}</span>`;
+            if (e.currency!=='THB'&&rate&&rate>0) {
+              perCell+=`<br><span style="font-size:0.68rem;color:var(--text-hint)">≈฿${(per/rate).toFixed(2)}</span>`;
+            }
+          } else if (e.splitMode==='custom') {
+            perCell='<span style="font-size:0.79rem;color:var(--text-muted)">Custom</span>';
+          }
+
           return `<tr>
-            <td style="color:var(--text-hint);font-size:0.79rem">${i+1}</td>
+            <td style="color:var(--text-hint);font-size:0.79rem">${i+1}${e.date?`<br><span style="font-size:0.67rem">${e.date}</span>`:''}</td>
             <td>${esc(e.desc||'—')}</td>
-            <td>${fa.primary}${fa.secondary?`<span class="converted-sub">${fa.secondary}</span>`:''}</td>
+            <td>${sym}${amt.toFixed(dec)}${amtTHB!==null&&e.currency!=='THB'?`<span class="converted-sub">≈฿${amtTHB.toFixed(2)}</span>`:''}</td>
             <td>${e.payer?`<div class="person-cell">${avEl(e.payer,18)}<span>${esc(e.payer)}</span></div>`:'<span style="color:var(--text-hint)">—</span>'}</td>
-            <td style="font-size:0.79rem;color:var(--text-muted)">${e.splitWith.map(p=>esc(p)).join(', ')||'—'}</td>
-            <td><span class="badge">${fp2.primary}</span>${fp2.secondary?`<br><span style="font-size:0.68rem;color:var(--text-hint)">${fp2.secondary}</span>`:''}</td>
+            <td style="font-size:0.79rem;color:var(--text-muted)">${e.splitMode==='equal'?e.splitWith.map(p=>esc(p)).join(', ')||'—':'Custom'}</td>
+            <td>${perCell}</td>
           </tr>`;
         }).join('')}
       </tbody>
@@ -1062,179 +1536,420 @@ function renderSummary() {
 }
 
 /* ══════════════════════════════════════════
-   SETTLEMENT ALGORITHM
-   Greedy: largest creditor ↔ largest debtor
+   SETTLEMENT ALGORITHM (unchanged)
 ══════════════════════════════════════════ */
 function computeSettlements(bal) {
-  const cred=[], debt=[];
-  Object.entries(bal).forEach(([n,a]) => {
-    if (a> 0.005) cred.push({name:n, amt: a});
-    if (a<-0.005) debt.push({name:n, amt:-a});
+  const cred=[],debt=[];
+  Object.entries(bal).forEach(([n,a])=>{
+    if (a> 0.005) cred.push({name:n,amt:a});
+    if (a<-0.005) debt.push({name:n,amt:-a});
   });
   cred.sort((a,b)=>b.amt-a.amt);
   debt.sort((a,b)=>b.amt-a.amt);
   const res=[]; let ci=0,di=0;
-  while (ci<cred.length && di<debt.length) {
-    const c=cred[ci], d=debt[di], t=Math.min(c.amt,d.amt);
-    res.push({from:d.name, to:c.name, amount:t});
+  while(ci<cred.length&&di<debt.length){
+    const c=cred[ci],d=debt[di],t=Math.min(c.amt,d.amt);
+    res.push({from:d.name,to:c.name,amount:t});
     c.amt-=t; d.amt-=t;
-    if (c.amt<0.005) ci++;
-    if (d.amt<0.005) di++;
+    if(c.amt<0.005)ci++;
+    if(d.amt<0.005)di++;
   }
   return res;
 }
 
 /* ══════════════════════════════════════════
-   SHARE  — stores trip on jsonbin.io (free,
-   no auth). Friends open the same HTML file
-   and enter the Trip ID, or load ?bin=<id>
+   EXPORT — PDF
 ══════════════════════════════════════════ */
-const JSONBIN_KEY = '$2a$10$placeholder_replaced_at_runtime';
-// We use the public/anonymous endpoint – no API key needed for small bins
-const BIN_API = 'https://api.jsonbin.io/v3/b';
-
-async function shareTrip() {
-  showShareModal();
+function exportPDF() {
+  const html = buildPrintHTML();
+  const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const win  = window.open(url, '_blank');
+  if (!win) showToast('Allow pop-ups to export PDF.');
+  setTimeout(()=>URL.revokeObjectURL(url), 120000);
 }
 
-function showShareModal() {
-  document.getElementById('share-modal').style.display = 'flex';
+function buildPrintHTML() {
+  const tripTitle = state.tripName || 'Trip Summary';
+
+  const paid={},owed={};
+  state.people.forEach(p=>{paid[p]=0;owed[p]=0;});
+  const allExp = state.expenses.filter(e=>e.payer&&state.people.includes(e.payer)&&parseFloat(e.amount)>0);
+  allExp.forEach(e=>{
+    const rate=e.currency==='THB'?1:e.currencyRate;
+    if(!rate||rate<=0) return;
+    const amtTHB=parseFloat(e.amount)/rate;
+    paid[e.payer]+=amtTHB;
+    if(e.splitMode==='equal'){
+      const m=e.splitWith.filter(p=>state.people.includes(p));
+      if(m.length>0){const s=amtTHB/m.length;m.forEach(p=>{owed[p]+=s;});}
+    } else {
+      state.people.forEach(p=>{owed[p]+=(parseFloat(e.customAmounts[p])||0)/rate;});
+    }
+  });
+  const balance={};
+  state.people.forEach(p=>{balance[p]=(paid[p]||0)-(owed[p]||0);});
+  const settlements=computeSettlements({...balance});
+  const totalTHB=allExp.reduce((s,e)=>{
+    const rate=e.currency==='THB'?1:e.currencyRate;
+    return s+(rate&&rate>0?parseFloat(e.amount)/rate:0);
+  },0);
+
+  const dateStr = (() => {
+    if (state.tripDateStart&&state.tripDateEnd&&state.tripDateStart!==state.tripDateEnd)
+      return state.tripDateStart+' – '+state.tripDateEnd;
+    if (state.tripDateStart) return state.tripDateStart;
+    return '';
+  })();
+
+  const balRows = state.people.map(p=>{
+    const net=balance[p];
+    const sign=net>0.005?'+':net<-0.005?'−':'';
+    const color=net>0.005?'#3a7d52':net<-0.005?'#b04060':'#888';
+    return `<tr>
+      <td style="padding:0.5rem 0.4rem;border-bottom:1px solid #EDE7F6;font-weight:500">${esc(p)}</td>
+      <td style="padding:0.5rem 0.4rem;border-bottom:1px solid #EDE7F6">฿${(paid[p]||0).toFixed(2)}</td>
+      <td style="padding:0.5rem 0.4rem;border-bottom:1px solid #EDE7F6">฿${(owed[p]||0).toFixed(2)}</td>
+      <td style="padding:0.5rem 0.4rem;border-bottom:1px solid #EDE7F6;font-weight:700;color:${color}">${sign}฿${Math.abs(net).toFixed(2)}</td>
+    </tr>`;
+  }).join('');
+
+  const settleRows = settlements.length===0
+    ? `<p style="background:#E8F5EE;color:#3a7d52;padding:0.8rem;border-radius:10px;font-weight:600;text-align:center;border:1px solid #B8DFC8">✓ All settled up! No transfers needed.</p>`
+    : settlements.map(s=>{
+        const settled=state.settledTransfers.includes(s.from+'→'+s.to);
+        return `<div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0.9rem;background:${settled?'#f5f5f5':'#FBF3E5'};border:1px solid ${settled?'#ddd':'#EED9B8'};border-radius:10px;margin-bottom:0.4rem;${settled?'opacity:0.55':''}">
+          <span style="font-weight:600">${esc(s.from)}</span>
+          <span style="color:#9A7040">→</span>
+          <span style="font-weight:600">${esc(s.to)}</span>
+          <span style="margin-left:auto;font-weight:700;color:${settled?'#888':'#9A7040'};${settled?'text-decoration:line-through':''}">฿${s.amount.toFixed(2)}</span>
+          ${settled?'<span style="font-size:0.72rem;color:#3a7d52;font-weight:700">PAID</span>':''}
+        </div>`;
+      }).join('');
+
+  const expRows = state.expenses.map((e,i)=>{
+    const sym=SYM[e.currency]||e.currency;
+    const dec=NODEC.has(e.currency)?0:2;
+    const amt=parseFloat(e.amount)||0;
+    const rate=e.currency==='THB'?1:e.currencyRate;
+    const amtTHB=rate&&rate>0?amt/rate:null;
+    const splitDesc=e.splitMode==='equal'
+      ?e.splitWith.join(', ')
+      :'Custom: '+state.people.map(p=>p+' '+fmtCur(parseFloat(e.customAmounts[p])||0,e.currency)).join(', ');
+    return `<tr>
+      <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6;color:#aaa;font-size:0.8rem">${i+1}${e.date?`<br><span style="font-size:0.68rem">${e.date}</span>`:''}</td>
+      <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6;font-weight:500">${esc(e.desc||'—')}</td>
+      <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6">${sym}${amt.toFixed(dec)}${amtTHB!==null&&e.currency!=='THB'?`<br><span style="font-size:0.7rem;color:#aaa">≈฿${amtTHB.toFixed(2)}</span>`:''}</td>
+      <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6">${esc(e.payer||'—')}</td>
+      <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6;font-size:0.78rem;color:#8674A3">${esc(splitDesc)}</td>
+    </tr>`;
+  }).join('');
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${esc(tripTitle)} — HarnKao Summary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#F9F7FC;color:#2A1F3D;font-size:14px;line-height:1.6}
+.page{max-width:800px;margin:0 auto;padding:2rem}
+.print-header{background:linear-gradient(135deg,#7B5EA7,#A090BA);color:white;border-radius:16px;padding:1.75rem 2rem;margin-bottom:1.5rem;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.print-header h1{font-size:1.55rem;font-weight:700;letter-spacing:-0.02em}
+.print-header .sub{font-size:0.8rem;opacity:0.78;margin-top:0.25rem}
+.print-header .right{text-align:right;font-size:0.75rem;opacity:0.72;flex-shrink:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.stat{background:white;border:1px solid #DDD3ED;border-radius:12px;padding:0.9rem;text-align:center}
+.stat.accent{background:linear-gradient(135deg,#7B5EA7,#A090BA);border:none}
+.stat-lbl{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:#B0A0C8;font-weight:600;margin-bottom:0.15rem}
+.accent .stat-lbl{color:rgba(255,255,255,0.72)}
+.stat-val{font-size:1.35rem;font-weight:700;color:#2A1F3D;letter-spacing:-0.02em}
+.accent .stat-val{color:white}
+.stat-sub{font-size:0.7rem;color:rgba(255,255,255,0.7);margin-top:0.05rem}
+section{background:white;border:1px solid #EDE7F6;border-radius:14px;padding:1.25rem 1.4rem;margin-bottom:1.25rem}
+.section-title{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;color:#B0A0C8;font-weight:600;margin-bottom:0.9rem;padding-bottom:0.5rem;border-bottom:1px solid #EDE7F6;display:flex;align-items:center;gap:0.5rem}
+table{width:100%;border-collapse:collapse}
+th{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:#B0A0C8;font-weight:600;text-align:left;padding:0 0.4rem 0.45rem;border-bottom:1px solid #EDE7F6}
+.no-print{text-align:center;padding:2rem 0;border-top:1px solid #EDE7F6;margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:center}
+.no-print button{font-family:inherit;font-size:0.88rem;font-weight:600;cursor:pointer;padding:0.65rem 1.4rem;border-radius:10px;border:none;transition:all 0.15s}
+.print-btn{background:linear-gradient(135deg,#7B5EA7,#A090BA);color:white;box-shadow:0 2px 8px rgba(123,94,167,0.35)}
+.close-btn{background:#F4EFFA;color:#5C4A7A;border:1.5px solid #DDD3ED !important}
+.footer-note{text-align:center;font-size:0.72rem;color:#B0A0C8;margin-top:1rem;padding-top:1rem;border-top:1px solid #EDE7F6}
+@media print{
+  body{background:white}
+  .page{padding:1rem}
+  .print-header{border-radius:8px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .stat.accent{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  section{break-inside:avoid}
+  .no-print{display:none}
 }
-function hideShareModal() {
-  document.getElementById('share-modal').style.display = 'none';
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="print-header">
+    <div>
+      <div style="font-size:1.6rem;margin-bottom:0.35rem">🍚</div>
+      <h1>${esc(tripTitle)}</h1>
+      ${dateStr?`<div class="sub">📅 ${esc(dateStr)}</div>`:''}
+      <div class="sub">HarnKao — Trip Expense Splitter</div>
+    </div>
+    <div class="right">
+      Generated<br>${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}<br>
+      ${state.people.length} people · ${state.expenses.length} expenses
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat accent">
+      <div class="stat-lbl">Total Spent</div>
+      <div class="stat-val">฿${totalTHB.toFixed(2)}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">Expenses</div>
+      <div class="stat-val">${state.expenses.length}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-lbl">People</div>
+      <div class="stat-val">${state.people.length}</div>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-title">⚖️ Balance per person</div>
+    <table>
+      <thead><tr><th>Person</th><th>Paid</th><th>Owes (share)</th><th>Net</th></tr></thead>
+      <tbody>${balRows}</tbody>
+    </table>
+  </section>
+
+  <section>
+    <div class="section-title">💸 Who pays whom</div>
+    ${settleRows}
+  </section>
+
+  <section>
+    <div class="section-title">📋 Expense breakdown</div>
+    <table>
+      <thead><tr><th>#</th><th>Item</th><th>Amount</th><th>Paid by</th><th>Split</th></tr></thead>
+      <tbody>${expRows}</tbody>
+    </table>
+  </section>
+
+  <div class="footer-note">Generated by HarnKao — หารข้าว</div>
+
+  <div class="no-print">
+    <button class="print-btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+    <button class="close-btn" onclick="window.close()">Close</button>
+  </div>
+</div>
+<script>
+  document.fonts.ready.then(()=>setTimeout(()=>window.print(),400));
+<\/script>
+</body>
+</html>`;
 }
+
+/* ══════════════════════════════════════════
+   EXPORT — PNG (html2canvas)
+══════════════════════════════════════════ */
+async function exportPNG() {
+  showToast('Preparing PNG…');
+  try {
+    if (!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+    const el = document.getElementById('summary-content');
+    const canvas = await html2canvas(el, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--surface').trim()||'#ffffff',
+      onclone: doc => {
+        doc.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme')||'light');
+        doc.querySelectorAll('.export-bar').forEach(el=>{ el.style.display='none'; });
+      }
+    });
+    const link = document.createElement('a');
+    link.download = (state.tripName||'trip').replace(/[^a-z0-9]/gi,'_').toLowerCase()+'_summary.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('PNG downloaded!');
+  } catch(err) {
+    console.error(err);
+    showToast('PNG failed — try PDF instead.');
+  }
+}
+
+function loadScript(src) {
+  return new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src=src; s.onload=res; s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+/* ══════════════════════════════════════════
+   SHARE (jsonbin.io — unchanged logic)
+══════════════════════════════════════════ */
+function shareTrip() { showShareModal(); }
+function showShareModal() { document.getElementById('share-modal').style.display='flex'; }
+function hideShareModal() { document.getElementById('share-modal').style.display='none'; }
 
 async function doShare() {
-  const btn = document.getElementById('share-btn-inner');
-  btn.disabled = true;
-  btn.textContent = 'Saving…';
-  const resultEl = document.getElementById('share-result');
-  resultEl.innerHTML = '';
+  const btn=document.getElementById('share-btn-inner');
+  btn.disabled=true; btn.textContent='Saving…';
+  const resultEl=document.getElementById('share-result');
+  resultEl.innerHTML='';
 
-  // Compact the state – strip temp ids to save space
-  const payload = {
-    p: state.people,
-    e: state.expenses.map(e=>({
-      d: e.desc, a: e.amount, py: e.payer, sw: e.splitWith
-    }))
+  const payload={
+    p:state.people,
+    e:state.expenses.map(e=>({d:e.desc,a:e.amount,dt:e.date,cur:e.currency,cr:e.currencyRate,py:e.payer,sm:e.splitMode,sw:e.splitWith,ca:e.customAmounts})),
+    tn:state.tripName, ts:state.tripDateStart, te:state.tripDateEnd
   };
 
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Bin-Private': 'false' },
-      body: JSON.stringify(payload)
+    const res=await fetch('https://api.jsonbin.io/v3/b',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Bin-Private':'false'},
+      body:JSON.stringify(payload)
     });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const id = data.metadata.id;
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const id=data.metadata.id;
+    const base=window.location.href.split('?')[0];
+    const url=base+'?bin='+id;
 
-    // Build the shareable URL (works when opened from same file or a hosted version)
-    const base = window.location.href.split('?')[0];
-    const url  = base + '?bin=' + id;
-
-    resultEl.innerHTML = `
+    resultEl.innerHTML=`
       <div class="share-success">
         <div class="share-id-label">Trip ID</div>
         <div class="share-id-box">
-          <span id="trip-id-text">${id}</span>
-          <button class="btn btn-soft" style="padding:0.3rem 0.6rem;font-size:0.78rem" onclick="copyText('${id}','ID copied!')">Copy ID</button>
+          <span>${id}</span>
+          <button class="btn btn-soft" style="padding:0.3rem 0.6rem;font-size:0.78rem" onclick="copyText('${esc(id)}','ID copied!')">Copy ID</button>
         </div>
         <div class="share-id-label" style="margin-top:0.6rem">Or share full link</div>
         <div class="share-url-box">
-          <span class="share-url-text">${url}</span>
+          <span class="share-url-text">${esc(url)}</span>
           <button class="btn btn-soft" style="padding:0.3rem 0.6rem;font-size:0.78rem;flex-shrink:0" onclick="copyText('${esc(url)}','Link copied!')">Copy</button>
         </div>
         <p class="share-hint">Friends can open this HTML file and paste the Trip ID, or open the full link directly.</p>
       </div>`;
   } catch(err) {
-    resultEl.innerHTML = `<p style="color:var(--negative);font-size:0.84rem">⚠️ Could not save trip online. Check your connection and try again.<br><small>${err.message}</small></p>`;
+    resultEl.innerHTML=`<p style="color:var(--negative);font-size:0.84rem">⚠️ Could not save. Check your connection.<br><small>${esc(err.message)}</small></p>`;
   }
-
-  btn.disabled = false;
-  btn.textContent = 'Create share link';
+  btn.disabled=false; btn.textContent='Create share link';
 }
 
 async function loadFromId() {
-  const inp = document.getElementById('load-id-input');
-  const id  = inp.value.trim().replace(/\s/g,'');
-  if (!id) { showToast('Paste a Trip ID first.'); return; }
-  const btn = document.getElementById('load-btn-inner');
-  btn.disabled = true; btn.textContent = 'Loading…';
+  const inp=document.getElementById('load-id-input');
+  const id=inp.value.trim().replace(/\s/g,'');
+  if(!id){showToast('Paste a Trip ID first.');return;}
+  const btn=document.getElementById('load-btn-inner');
+  btn.disabled=true; btn.textContent='Loading…';
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+id+'/latest');
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    const r = data.record;
-    // Restore full state from compact format
-    state = {
-      people: r.p,
-      expenses: r.e.map((x,i)=>({ id: Date.now()+i, desc:x.d, amount:x.a, payer:x.py, splitWith:x.sw }))
-    };
+    const res=await fetch('https://api.jsonbin.io/v3/b/'+id+'/latest');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+    const r=data.record;
+    state=migrateState({
+      people:r.p||[],
+      expenses:(r.e||[]).map((x,i)=>({
+        id:Date.now()+i, desc:x.d||'', date:x.dt||'', amount:x.a||'',
+        currency:x.cur||'THB', currencyRate:x.cr!==undefined?x.cr:1,
+        payer:x.py||'', splitMode:x.sm||'equal',
+        splitWith:x.sw||[], customAmounts:x.ca||{}
+      })),
+      tripName:r.tn||'', tripDateStart:r.ts||'', tripDateEnd:r.te||''
+    });
     save();
+    syncTripInfoUI();
     renderPeople(); renderExpenses(); renderSummary();
     hideShareModal();
-    showToast('Trip loaded! 🎉');
-  } catch(err) {
-    showToast('Could not load that ID. Double-check and try again.');
-  }
-  btn.disabled = false; btn.textContent = 'Load trip';
+    showToast('Trip loaded!');
+  } catch(err) { showToast('Could not load that ID. Double-check and try again.'); }
+  btn.disabled=false; btn.textContent='Load trip';
 }
 
-// Also handle ?bin= on page load
 async function tryLoadFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const bin = params.get('bin');
-  if (!bin) return false;
+  const params=new URLSearchParams(window.location.search);
+  const bin=params.get('bin');
+  if(!bin) return false;
   try {
-    const res = await fetch('https://api.jsonbin.io/v3/b/'+bin+'/latest');
-    if (!res.ok) return false;
-    const data = await res.json();
-    const r = data.record;
-    state = {
-      people: r.p,
-      expenses: r.e.map((x,i)=>({ id: Date.now()+i, desc:x.d, amount:x.a, payer:x.py, splitWith:x.sw }))
-    };
+    const res=await fetch('https://api.jsonbin.io/v3/b/'+bin+'/latest');
+    if(!res.ok) return false;
+    const data=await res.json();
+    const r=data.record;
+    state=migrateState({
+      people:r.p||[],
+      expenses:(r.e||[]).map((x,i)=>({
+        id:Date.now()+i, desc:x.d||'', date:x.dt||'', amount:x.a||'',
+        currency:x.cur||'THB', currencyRate:x.cr!==undefined?x.cr:1,
+        payer:x.py||'', splitMode:x.sm||'equal',
+        splitWith:x.sw||[], customAmounts:x.ca||{}
+      })),
+      tripName:r.tn||'', tripDateStart:r.ts||'', tripDateEnd:r.te||''
+    });
     return true;
-  } catch(e) { return false; }
+  } catch(e){ return false; }
 }
 
-function copyText(text, msg) {
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function copyText(text,msg) {
   navigator.clipboard.writeText(text)
     .then(()=>showToast(msg||'Copied!'))
-    .catch(()=>{ document.execCommand && document.execCommand('copy'); showToast(msg||'Copied!'); });
+    .catch(()=>showToast(msg||'Copied!'));
 }
 
 function showToast(msg) {
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 2800);
+  setTimeout(()=>t.classList.remove('show'),2800);
 }
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-function save() {
-  try { localStorage.setItem('harnkao', JSON.stringify(state)); } catch(e){}
-}
-
+/* ══════════════════════════════════════════
+   PERSISTENCE
+══════════════════════════════════════════ */
 function loadState() {
-  const params = new URLSearchParams(window.location.search);
-  const trip   = params.get('trip');
-  if (trip) { try { state=JSON.parse(decodeURIComponent(atob(trip))); return; } catch(e){} }
-  try { const s=localStorage.getItem('harnkao'); if(s){state=JSON.parse(s); return;} } catch(e){}
-  // Default sample data
-  state = {
-    people: ['A','B','C','D'],
-    expenses: [
-      {id:1, desc:'Car fuel',   amount:'1000', payer:'A', splitWith:['A','B','C','D']},
-      {id:2, desc:'Breakfast',  amount:'620',  payer:'A', splitWith:['A','B','C','D']},
-      {id:3, desc:'Coffee',     amount:'300',  payer:'B', splitWith:['A','B','C']},
-      {id:4, desc:'Movies',     amount:'420',  payer:'C', splitWith:['A','B','C','D']},
-      {id:5, desc:'Dinner',     amount:'1177', payer:'D', splitWith:['A','B','C','D']}
+  // Try current trip
+  try {
+    const cur=localStorage.getItem('hk_current');
+    if(cur){
+      const raw=localStorage.getItem('hk_trip_'+cur);
+      if(raw){ state=migrateState(JSON.parse(raw)); return; }
+    }
+  } catch(e){}
+
+  // Migration: old single-trip format
+  try {
+    const old=localStorage.getItem('harnkao');
+    if(old){
+      state=migrateState(JSON.parse(old));
+      state.tripName=state.tripName||'My Trip';
+      save();
+      return;
+    }
+  } catch(e){}
+
+  // Default sample
+  state=migrateState({
+    tripName:'Sample Trip',
+    tripDateStart:'2025-06-21',
+    tripDateEnd:'2025-06-23',
+    people:['A','B','C','D'],
+    expenses:[
+      {id:1,desc:'Car fuel',  date:'2025-06-21',amount:'1000',currency:'THB',currencyRate:1,payer:'A',splitMode:'equal',splitWith:['A','B','C','D'],customAmounts:{}},
+      {id:2,desc:'Breakfast', date:'2025-06-21',amount:'620', currency:'THB',currencyRate:1,payer:'A',splitMode:'equal',splitWith:['A','B','C','D'],customAmounts:{}},
+      {id:3,desc:'Coffee',    date:'2025-06-21',amount:'300', currency:'THB',currencyRate:1,payer:'B',splitMode:'equal',splitWith:['A','B','C'],customAmounts:{}},
+      {id:4,desc:'Movies',    date:'2025-06-22',amount:'420', currency:'THB',currencyRate:1,payer:'C',splitMode:'equal',splitWith:['A','B','C','D'],customAmounts:{}},
+      {id:5,desc:'Dinner',    date:'2025-06-22',amount:'1177',currency:'THB',currencyRate:1,payer:'D',splitMode:'equal',splitWith:['A','B','C','D'],customAmounts:{}}
     ]
-  };
+  });
+  save();
 }
 
 /* ══════════════════════════════════════════
@@ -1242,25 +1957,32 @@ function loadState() {
 ══════════════════════════════════════════ */
 loadTheme();
 
-(async () => {
-  const fromUrl = await tryLoadFromUrl();
-  if (!fromUrl) loadState();
+(async()=>{
+  const fromUrl=await tryLoadFromUrl();
+  if(!fromUrl) loadState();
 
   try {
-    const savedCur = localStorage.getItem('hk_currency');
-    if (savedCur) {
-      activeCurrency = savedCur;
-      document.getElementById('currency-select').value = savedCur;
+    const savedCur=localStorage.getItem('hk_currency');
+    if(savedCur){
+      activeCurrency=savedCur;
+      document.getElementById('currency-select').value=savedCur;
       fetchRates();
     }
   } catch(e){}
 
+  syncTripInfoUI();
   renderPeople(); renderExpenses(); renderSummary();
 })();
 
-document.getElementById('new-person-input').addEventListener('keydown', e => {
-  if (e.key==='Enter') addPerson();
+document.getElementById('new-person-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter') addPerson();
 });
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  });
+}
 </script>
 </body>
 </html>

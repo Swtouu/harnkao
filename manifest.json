@@ -1,0 +1,26 @@
+{
+  "name": "HarnKao — Trip Expense Splitter",
+  "short_name": "HarnKao",
+  "description": "หารข้าว — Split trip expenses with friends",
+  "start_url": "/HarnKao.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F9F7FC",
+  "theme_color": "#7B5EA7",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/Harnkao.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Harnkao.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
