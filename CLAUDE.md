@@ -6,23 +6,23 @@ Single-file trip expense splitter web app. No build step, no framework, no depen
 
 ```bash
 # Open directly in browser (basic testing — PWA/SW won't work on file://)
-open HarnKao.html
+open public/HarnKao.html
 
 # Serve locally for full PWA testing (SW + manifest require HTTP)
-npx serve .
+npx serve public
 # or
-python3 -m http.server 8080
+python3 -m http.server 8080 --directory public
 ```
 
 ## Project files
 
 | File | Purpose |
 |------|---------|
-| `HarnKao.html` | The entire app — HTML, CSS, and JS in one file |
-| `manifest.json` | Web App Manifest (PWA install metadata) |
-| `sw.js` | Service worker — offline caching |
-| `Harnkao.png` | Official app logo (1254×1254 px), used in header and as PWA icon |
-| `netlify.toml` | Deploys root dir; rewrites `/` → `/HarnKao.html` |
+| `public/HarnKao.html` | The entire app — HTML, CSS, and JS in one file |
+| `public/manifest.json` | Web App Manifest (PWA install metadata) |
+| `public/sw.js` | Service worker — offline caching |
+| `public/Harnkao.png` | Official app logo (1254×1254 px), used in header and as PWA icon |
+| `netlify.toml` | Deploys `public/`; rewrites `/` → `/HarnKao.html` |
 | `docs/` | Changelog documents (gitignored) |
 
 ## Architecture
@@ -40,7 +40,7 @@ Everything lives in `HarnKao.html`. JS is organised into sections delimited by b
 - **Settlement algorithm** — `computeSettlements` (greedy creditor/debtor)
 - **Export PDF** — `exportPDF`, `buildPrintHTML`
 - **Export PNG** — `exportPNG`, `loadScript`
-- **Share** — `shareTrip`, `tripPayload`, `payloadToState`, `encodeTrip`, `decodeTrip`, `copyShareLink`, `shortenLink`, `loadFromId`, `tryLoadFromUrl`
+- **Share** — `shareTrip`, `tripPayload`, `payloadToState`, `encodeTrip`, `decodeTrip`, `copyShareLink`, `shortenLink` (copies short URL to clipboard only — does not overwrite the displayed long URL), `loadFromId`, `tryLoadFromUrl`
 - **Utils** — `copyText`, `showToast`, `esc`
 - **Persistence** — `loadState`
 - **Init** — async IIFE; SW registration
@@ -117,6 +117,7 @@ Netlify reads `netlify.toml`. Push to the connected branch → Netlify deploys r
 ## Key invariants to maintain
 
 - `esc()` must be used for all user-supplied strings rendered into HTML. Never embed person names directly in `onclick` attribute strings — use `data-*` attributes and `this.dataset.*` instead.
+- The payer dropdown in `renderExpenses` is wrapped in `.payer-wrap` (flex row) with a `.payer-lbl` "Paid by" label. On mobile the wrapper takes `width:100%` via the `@media (max-width:560px)` block — if restructuring that area, keep `.payer-wrap` in the mobile override rule alongside `.field-amount` etc.
 - `currencyRate` must be snapshotted at currency-select time, never read from global `rates` during settlement calculation.
 - `state.settledTransfers` must be cleared (`= []`) whenever any balance-affecting field changes (amount, currency, payer, splitWith, customAmounts).
 - `buildPrintHTML` duplicates the balance/settlement calculation from `renderSummary` — keep both in sync when editing the math.

@@ -324,7 +324,9 @@ input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, select
 .field-amount { width: 100px; }
 .field-currency { width: 78px; padding-left: 0.45rem !important; }
 .field-date { width: 140px; font-size: 0.83rem !important; }
-.field-payer { min-width: 95px; flex:1; }
+.payer-wrap { display: flex; align-items: center; gap: 0.35rem; flex: 1; min-width: 95px; }
+.payer-lbl { font-size: 0.68rem; font-weight: 600; color: var(--text-hint); white-space: nowrap; flex-shrink: 0; }
+.field-payer { flex: 1; min-width: 0; }
 
 /* Amount + currency grouped */
 .amount-cur-wrap { display: flex; gap: 0.3rem; align-items: center; }
@@ -679,6 +681,7 @@ input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, select
 @media (max-width: 560px) {
   .expense-fields { flex-direction: column; }
   .field-amount, .field-payer, .field-date, .field-currency { width: 100%; }
+  .payer-wrap { width: 100%; }
   .amount-cur-wrap { width: 100%; }
   .amount-cur-wrap .field-amount { flex: 1; }
   .amount-cur-wrap .field-currency { width: 78px; }
@@ -845,7 +848,7 @@ input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, select
     <div class="modal-divider"></div>
     <div class="modal-section">
       <div class="modal-section-label">📥 Load a trip by ID</div>
-      <p class="modal-desc">Have an old Trip ID from a friend? Paste it below.</p>
+      <p class="modal-desc">Have a Trip ID from a friend? Paste it below.</p>
       <div class="input-row">
         <input type="text" id="load-id-input" placeholder="Paste Trip ID here…" style="flex:1;font-family:monospace;font-size:0.85rem" />
         <button class="btn btn-soft" id="load-btn-inner" onclick="loadFromId()">Load trip</button>
@@ -1363,10 +1366,13 @@ function renderExpenses() {
           </div>
           <input class="field-date" type="date" value="${esc(e.date)}" title="Expense date"
             onchange="updateExpense(${e.id},'date',this.value)" />
-          <select class="field-payer" onchange="updateExpense(${e.id},'payer',this.value)">
-            <option value="">— Paid by —</option>
-            ${state.people.map(p=>`<option value="${esc(p)}" ${e.payer===p?'selected':''}>${esc(p)}</option>`).join('')}
-          </select>
+          <div class="payer-wrap">
+            <span class="payer-lbl">Paid by</span>
+            <select class="field-payer" title="Who paid for this expense" onchange="updateExpense(${e.id},'payer',this.value)">
+              <option value="">— Select —</option>
+              ${state.people.map(p=>`<option value="${esc(p)}" ${e.payer===p?'selected':''}>${esc(p)}</option>`).join('')}
+            </select>
+          </div>
         </div>
         <button class="btn btn-danger btn-icon" onclick="removeExpense(${e.id})" title="Delete">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
@@ -1934,53 +1940,12 @@ async function shortenLink() {
     const res = await fetch('https://is.gd/create.php?format=json&url=' + encodeURIComponent(longUrl));
     const data = await res.json();
     if (!data.shorturl) throw new Error('no shorturl');
-    urlEl.textContent = data.shorturl;
     copyText(data.shorturl, 'Short link copied!');
     btn.textContent = '✓';
   } catch(e) {
     showToast('Could not shorten — copy the full link instead.');
     btn.disabled = false; btn.textContent = 'Shorten';
   }
-}
-
-async function doShare() {
-  const btn=document.getElementById('share-btn-inner');
-  btn.disabled=true; btn.textContent='Saving…';
-  const resultEl=document.getElementById('share-result');
-  resultEl.innerHTML='';
-
-  const payload=tripPayload();
-
-  try {
-    const res=await fetch('https://api.jsonbin.io/v3/b',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','X-Bin-Private':'false'},
-      body:JSON.stringify(payload)
-    });
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    const id=data.metadata.id;
-    const base=window.location.href.split('?')[0];
-    const url=base+'?bin='+id;
-
-    resultEl.innerHTML=`
-      <div class="share-success">
-        <div class="share-id-label">Trip ID</div>
-        <div class="share-id-box">
-          <span>${id}</span>
-          <button class="btn btn-soft" style="padding:0.3rem 0.6rem;font-size:0.78rem" onclick="copyText('${esc(id)}','ID copied!')">Copy ID</button>
-        </div>
-        <div class="share-id-label" style="margin-top:0.6rem">Or share full link</div>
-        <div class="share-url-box">
-          <span class="share-url-text">${esc(url)}</span>
-          <button class="btn btn-soft" style="padding:0.3rem 0.6rem;font-size:0.78rem;flex-shrink:0" onclick="copyText('${esc(url)}','Link copied!')">Copy</button>
-        </div>
-        <p class="share-hint">Friends can open this HTML file and paste the Trip ID, or open the full link directly.</p>
-      </div>`;
-  } catch(err) {
-    resultEl.innerHTML=`<p style="color:var(--negative);font-size:0.84rem">⚠️ Could not save. Check your connection.<br><small>${esc(err.message)}</small></p>`;
-  }
-  btn.disabled=false; btn.textContent='Save & get ID';
 }
 
 async function loadFromId() {
