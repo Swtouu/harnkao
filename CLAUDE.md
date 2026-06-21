@@ -23,14 +23,13 @@ python3 -m http.server 8080
 | `sw.js` | Service worker — offline caching |
 | `Harnkao.png` | Official app logo (1254×1254 px), used in header and as PWA icon |
 | `netlify.toml` | Deploys root dir; rewrites `/` → `/HarnKao.html` |
-| `icon.svg` | Superseded by `Harnkao.png` — safe to delete |
 | `docs/` | Changelog documents (gitignored) |
 
 ## Architecture
 
 Everything lives in `HarnKao.html`. JS is organised into sections delimited by block comments:
 
-- **Constants** — `SYM`, `NODEC`, `CURRENCIES`, `AV`
+- **Constants** — `SYM`, `NODEC`, `CURRENCIES`, `AV`, `CATEGORIES`, `CAT_EMOJI`
 - **Currency & rates** — `fetchRates`, `updateRateBanner`, `fmt`, `fmtCur`, `onCurrencyChange`
 - **Theme** — `toggleTheme`, `loadTheme`
 - **State** — global `state` object; `getAv`, `findExp`, `avEl`
@@ -41,7 +40,7 @@ Everything lives in `HarnKao.html`. JS is organised into sections delimited by b
 - **Settlement algorithm** — `computeSettlements` (greedy creditor/debtor)
 - **Export PDF** — `exportPDF`, `buildPrintHTML`
 - **Export PNG** — `exportPNG`, `loadScript`
-- **Share** — `shareTrip`, `doShare`, `loadFromId`, `tryLoadFromUrl` (jsonbin.io)
+- **Share** — `shareTrip`, `tripPayload`, `payloadToState`, `encodeTrip`, `decodeTrip`, `copyShareLink`, `shortenLink`, `loadFromId`, `tryLoadFromUrl`
 - **Utils** — `copyText`, `showToast`, `esc`
 - **Persistence** — `loadState`
 - **Init** — async IIFE; SW registration
@@ -65,7 +64,8 @@ state = {
     payer: 'Alice',
     splitMode: 'equal',       // 'equal' | 'custom'
     splitWith: ['Alice','Bob'],
-    customAmounts: {}         // {name: amountString} when splitMode==='custom'
+    customAmounts: {},        // {name: amountString} when splitMode==='custom'
+    category: 'Food'          // '' | 'Food' | 'Hotel' | 'Transport' | 'Activity' | 'Shopping' | 'Other'
   }],
   settledTransfers: ['Alice→Bob']  // visually marked paid; cleared on balance edits
 }
@@ -97,7 +97,7 @@ Base currency is always THB. `rates` object from `exchangerate-api.com/v4/latest
 - Cache name: `harnkao-v2` — bump version when deploying changes to shell files
 - Shell files pre-cached on install: `HarnKao.html`, `manifest.json`, `Harnkao.png`
 - Google Fonts: stale-while-revalidate (works offline after first load)
-- `api.jsonbin.io`, `api.exchangerate-api.com`, `cdnjs.cloudflare.com`: network-only pass-through
+- `api.jsonbin.io`, `api.exchangerate-api.com`, `cdnjs.cloudflare.com`, `is.gd`: network-only pass-through
 - SW only activates over HTTPS; `file://` silently skips registration
 
 ## External dependencies (runtime only)
@@ -105,7 +105,8 @@ Base currency is always THB. `rates` object from `exchangerate-api.com/v4/latest
 | Service | Used for | Fallback |
 |---------|----------|---------|
 | `exchangerate-api.com` | Live exchange rates | Hardcoded approximate rates + localStorage cache |
-| `jsonbin.io` | Share/load trips by ID | None — share requires network |
+| `is.gd` | Optional URL shortening (`shortenLink()`) | Full `?d=` URL still works if is.gd is unavailable |
+| `jsonbin.io` | Load old shared trips by ID (`loadFromId`, `?bin=`) — read-only | None |
 | Google Fonts (DM Sans) | Typography | System UI font stack |
 | `cdnjs` html2canvas 1.4.1 | PNG export | Lazy-loaded only on first PNG click |
 
@@ -119,4 +120,7 @@ Netlify reads `netlify.toml`. Push to the connected branch → Netlify deploys r
 - `currencyRate` must be snapshotted at currency-select time, never read from global `rates` during settlement calculation.
 - `state.settledTransfers` must be cleared (`= []`) whenever any balance-affecting field changes (amount, currency, payer, splitWith, customAmounts).
 - `buildPrintHTML` duplicates the balance/settlement calculation from `renderSummary` — keep both in sync when editing the math.
+- "By category" section in `renderSummary` only renders when at least one expense has `category !== ''` — do not default uncategorized expenses to `'Other'` in that loop.
+- `encodeTrip` uses chunked `String.fromCharCode` (8 KB at a time) before `btoa` — never pass a full `Uint8Array` spread to `btoa` directly (stack overflow risk on large trips).
+- Never call `btoa()` on a raw UTF-8 string — only on byte arrays from the gzip stream.
 - Bump `CACHE` constant in `sw.js` whenever shell files change and a deploy is planned.

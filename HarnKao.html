@@ -839,22 +839,13 @@ input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, select
       </button>
       <div class="quick-link-row" id="quick-share-row" style="display:none">
         <span class="quick-link-url" id="quick-share-url"></span>
+        <button class="btn btn-soft" id="shorten-btn" onclick="shortenLink()" style="flex-shrink:0;font-size:0.75rem;padding:0.3rem 0.6rem">Shorten</button>
       </div>
     </div>
     <div class="modal-divider"></div>
     <div class="modal-section">
-      <div class="modal-section-label">☁️ Save online (get a short ID)</div>
-      <p class="modal-desc">Stores the trip on jsonbin.io and generates a short link.</p>
-      <button class="btn btn-soft" id="share-btn-inner" onclick="doShare()" style="width:100%;justify-content:center">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Save &amp; get ID
-      </button>
-      <div id="share-result" style="margin-top:0.75rem"></div>
-    </div>
-    <div class="modal-divider"></div>
-    <div class="modal-section">
-      <div class="modal-section-label">📥 Load a shared trip</div>
-      <p class="modal-desc">Got a Trip ID from a friend? Paste it below.</p>
+      <div class="modal-section-label">📥 Load a trip by ID</div>
+      <p class="modal-desc">Have an old Trip ID from a friend? Paste it below.</p>
       <div class="input-row">
         <input type="text" id="load-id-input" placeholder="Paste Trip ID here…" style="flex:1;font-family:monospace;font-size:0.85rem" />
         <button class="btn btn-soft" id="load-btn-inner" onclick="loadFromId()">Load trip</button>
@@ -1931,6 +1922,25 @@ async function copyShareLink() {
     copyText(url, 'Link copied!');
   } catch(err) { showToast('Could not build link.'); }
   btn.disabled = false; btn.textContent = 'Copy link';
+}
+
+async function shortenLink() {
+  const btn = document.getElementById('shorten-btn');
+  const urlEl = document.getElementById('quick-share-url');
+  const longUrl = urlEl.textContent;
+  if (!longUrl) return;
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    const res = await fetch('https://is.gd/create.php?format=json&url=' + encodeURIComponent(longUrl));
+    const data = await res.json();
+    if (!data.shorturl) throw new Error('no shorturl');
+    urlEl.textContent = data.shorturl;
+    copyText(data.shorturl, 'Short link copied!');
+    btn.textContent = '✓';
+  } catch(e) {
+    showToast('Could not shorten — copy the full link instead.');
+    btn.disabled = false; btn.textContent = 'Shorten';
+  }
 }
 
 async function doShare() {
