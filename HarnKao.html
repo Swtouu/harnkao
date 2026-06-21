@@ -647,6 +647,32 @@ input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, select
 [data-theme="dark"] .av6 { background:#0E2030; color:#70C0F0; }
 [data-theme="dark"] .av7 { background:#1E2E08; color:#A0D060; }
 
+/* Category select */
+.field-category {
+  font-size: 0.79rem; padding: 0.28rem 0.5rem;
+  border-radius: 8px; border: 1.5px solid var(--border);
+  background: var(--surface2); color: var(--text);
+  font-family: inherit; cursor: pointer; transition: border-color 0.15s;
+  width: 100%;
+}
+.field-category:focus { border-color: var(--lilac-deep); outline: none; }
+
+/* Category breakdown bars */
+.cat-breakdown { display: flex; flex-direction: column; gap: 0.5rem; }
+.cat-bar-row { display: flex; align-items: center; gap: 0.55rem; }
+.cat-bar-label { font-size: 0.79rem; color: var(--text-muted); min-width: 100px; }
+.cat-bar-track { flex: 1; height: 7px; background: var(--border-soft); border-radius: 100px; overflow: hidden; }
+.cat-bar-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--grad-a), var(--grad-b)); transition: width 0.3s; }
+.cat-bar-amt { font-size: 0.78rem; font-weight: 600; color: var(--text); min-width: 70px; text-align: right; }
+
+/* Per-person spending bar in balance table */
+.spending-bar-track { display:inline-block; width:60px; height:5px; background: var(--border-soft); border-radius:100px; overflow:hidden; vertical-align:middle; margin-left:0.35rem; }
+.spending-bar-fill { display:block; height:100%; border-radius:100px; background: linear-gradient(90deg, var(--grad-a), var(--grad-b)); }
+
+/* Quick share link */
+.quick-link-row { display:flex; gap:0.5rem; align-items:center; margin-top:0.6rem; }
+.quick-link-url { flex:1; font-size:0.72rem; color:var(--text-hint); font-family:monospace; word-break:break-all; background:var(--surface2); border:1.5px solid var(--border); border-radius:8px; padding:0.4rem 0.6rem; line-height:1.4; }
+
 /* ══════════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════════ */
@@ -731,6 +757,10 @@ input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, select
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
           My Trips
         </button>
+        <button class="btn btn-soft trips-btn" onclick="if(confirm('Start a new trip? Your current trip is saved and accessible from My Trips.'))newTrip()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Trip
+        </button>
       </div>
     </div>
   </div>
@@ -801,11 +831,23 @@ input[type=text]:focus, input[type=number]:focus, input[type=date]:focus, select
       <button class="modal-close" onclick="hideShareModal()">×</button>
     </div>
     <div class="modal-section">
-      <div class="modal-section-label">📤 Share with friends</div>
-      <p class="modal-desc">Save your trip online and get a short ID or link to share.</p>
-      <button class="btn btn-primary" id="share-btn-inner" onclick="doShare()" style="width:100%;justify-content:center">
+      <div class="modal-section-label">⚡ Quick link — no account needed</div>
+      <p class="modal-desc">Encodes the trip into the URL itself. Instant, works offline.</p>
+      <button class="btn btn-primary" id="quick-share-btn" onclick="copyShareLink()" style="width:100%;justify-content:center">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Copy link
+      </button>
+      <div class="quick-link-row" id="quick-share-row" style="display:none">
+        <span class="quick-link-url" id="quick-share-url"></span>
+      </div>
+    </div>
+    <div class="modal-divider"></div>
+    <div class="modal-section">
+      <div class="modal-section-label">☁️ Save online (get a short ID)</div>
+      <p class="modal-desc">Stores the trip on jsonbin.io and generates a short link.</p>
+      <button class="btn btn-soft" id="share-btn-inner" onclick="doShare()" style="width:100%;justify-content:center">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Create share link
+        Save &amp; get ID
       </button>
       <div id="share-result" style="margin-top:0.75rem"></div>
     </div>
@@ -854,6 +896,8 @@ const SYM    = { THB:'฿',USD:'$',EUR:'€',GBP:'£',JPY:'¥',CNY:'¥',SGD:'S$'
 const NODEC  = new Set(['JPY','KRW']);
 const CURRENCIES = ['THB','USD','EUR','GBP','JPY','CNY','SGD','KRW','AUD','HKD','MYR','INR'];
 const AV     = ['av0','av1','av2','av3','av4','av5','av6','av7'];
+const CATEGORIES = ['Food','Hotel','Transport','Activity','Shopping','Other'];
+const CAT_EMOJI  = {Food:'🍽',Hotel:'🏨',Transport:'🚗',Activity:'🎡',Shopping:'🛍',Other:'📦'};
 
 /* ══════════════════════════════════════════
    CURRENCY & RATES
@@ -1030,6 +1074,7 @@ function migrateState(s) {
     if (!e.splitMode)    e.splitMode = 'equal';
     if (!e.customAmounts) e.customAmounts = {};
     if (!e.splitWith)    e.splitWith = [];
+    if (!e.category)     e.category = '';
   });
   return s;
 }
@@ -1163,7 +1208,8 @@ function addExpense() {
     payer: state.people[0]||'',
     splitMode: 'equal',
     splitWith: [...state.people],
-    customAmounts: {}
+    customAmounts: {},
+    category: ''
   });
   renderExpenses(); renderSummary(); save();
 }
@@ -1311,6 +1357,11 @@ function renderExpenses() {
         <div class="expense-fields">
           <input class="field-desc" type="text" placeholder="What was it?" value="${esc(e.desc)}"
             onchange="updateExpense(${e.id},'desc',this.value)" />
+          <select class="field-category" title="Category"
+            onchange="updateExpense(${e.id},'category',this.value)">
+            <option value="" ${!e.category?'selected':''}>— Category —</option>
+            ${CATEGORIES.map(c=>`<option value="${c}" ${e.category===c?'selected':''}>${CAT_EMOJI[c]} ${c}</option>`).join('')}
+          </select>
           <div class="amount-cur-wrap">
             <input class="field-amount" type="number" placeholder="Amount" value="${esc(e.amount)}"
               oninput="updateExpense(${e.id},'amount',this.value)" />
@@ -1460,23 +1511,27 @@ function renderSummary() {
 
     <div class="divider"></div>
     <div class="section-eyebrow" style="margin-bottom:0.65rem">Balance per person</div>
-    <table class="balance-table">
-      <thead><tr><th>Person</th><th>Paid</th><th>Owes (share)</th><th>Net</th></tr></thead>
-      <tbody>
-        ${state.people.map(p=>{
-          const net = balance[p];
-          const cls = net>0.005?'amount-positive':net<-0.005?'amount-negative':'amount-zero';
-          const lbl = net>0.005?'+'+fmt(net).primary:net<-0.005?'−'+fmt(Math.abs(net)).primary:fmt(0).primary;
-          const fp=fmt(paid[p]||0), fo=fmt(owed[p]||0);
-          return `<tr>
-            <td><div class="person-cell">${avEl(p,24)}<span>${esc(p)}</span></div></td>
-            <td>${fp.primary}${fp.secondary?`<span class="converted-sub">${fp.secondary}</span>`:''}</td>
-            <td>${fo.primary}${fo.secondary?`<span class="converted-sub">${fo.secondary}</span>`:''}</td>
-            <td class="${cls}">${lbl}${(()=>{const fn=fmt(Math.abs(net));return fn.secondary?`<span class="converted-sub">${fn.secondary}</span>`:''})()}</td>
-          </tr>`;
-        }).join('')}
-      </tbody>
-    </table>
+    ${(()=>{
+      const maxPaid = Math.max(...state.people.map(p=>paid[p]||0), 1);
+      return `<table class="balance-table">
+        <thead><tr><th>Person</th><th>Paid</th><th>Owes (share)</th><th>Net</th></tr></thead>
+        <tbody>
+          ${state.people.map(p=>{
+            const net = balance[p];
+            const cls = net>0.005?'amount-positive':net<-0.005?'amount-negative':'amount-zero';
+            const lbl = net>0.005?'+'+fmt(net).primary:net<-0.005?'−'+fmt(Math.abs(net)).primary:fmt(0).primary;
+            const fp=fmt(paid[p]||0), fo=fmt(owed[p]||0);
+            const pct = Math.round(((paid[p]||0)/maxPaid)*100);
+            return `<tr>
+              <td><div class="person-cell">${avEl(p,24)}<span>${esc(p)}</span></div></td>
+              <td>${fp.primary}<span class="spending-bar-track"><span class="spending-bar-fill" style="width:${pct}%"></span></span>${fp.secondary?`<span class="converted-sub">${fp.secondary}</span>`:''}</td>
+              <td>${fo.primary}${fo.secondary?`<span class="converted-sub">${fo.secondary}</span>`:''}</td>
+              <td class="${cls}">${lbl}${(()=>{const fn=fmt(Math.abs(net));return fn.secondary?`<span class="converted-sub">${fn.secondary}</span>`:''})()}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+    })()}
 
     <div class="divider"></div>
     <div class="section-eyebrow" style="margin-bottom:0.65rem">Who pays whom</div>
@@ -1498,6 +1553,34 @@ function renderSummary() {
           </li>`;
         }).join('')}</ul>`
     }
+
+    ${(()=>{
+      const catTotals = {};
+      allExpenses.forEach(e=>{
+        const cat = e.category;
+        if (!cat) return;
+        const rate = e.currency==='THB'?1:e.currencyRate;
+        if (!rate||rate<=0) return;
+        catTotals[cat] = (catTotals[cat]||0) + parseFloat(e.amount)/rate;
+      });
+      const cats = Object.entries(catTotals).sort((a,b)=>b[1]-a[1]);
+      if (!cats.length) return '';
+      const maxCat = cats[0][1];
+      return `<div class="divider"></div>
+        <div class="section-eyebrow" style="margin-bottom:0.65rem">By category</div>
+        <div class="cat-breakdown">
+          ${cats.map(([cat,amt])=>{
+            const f=fmt(amt);
+            const pct=Math.round((amt/maxCat)*100);
+            const icon=CAT_EMOJI[cat]||'📦';
+            return `<div class="cat-bar-row">
+              <span class="cat-bar-label">${icon} ${esc(cat)}</span>
+              <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${pct}%"></div></div>
+              <span class="cat-bar-amt">${f.primary}</span>
+            </div>`;
+          }).join('')}
+        </div>`;
+    })()}
 
     <div class="divider"></div>
     <div class="section-eyebrow" style="margin-bottom:0.65rem">Expense breakdown</div>
@@ -1638,7 +1721,7 @@ function buildPrintHTML() {
       :'Custom: '+state.people.map(p=>p+' '+fmtCur(parseFloat(e.customAmounts[p])||0,e.currency)).join(', ');
     return `<tr>
       <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6;color:#aaa;font-size:0.8rem">${i+1}${e.date?`<br><span style="font-size:0.68rem">${e.date}</span>`:''}</td>
-      <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6;font-weight:500">${esc(e.desc||'—')}</td>
+      <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6;font-weight:500">${esc(e.desc||'—')}${e.category?`<br><span style="font-size:0.68rem;color:#aaa">${(CAT_EMOJI[e.category]||'')+' '+e.category}</span>`:''}</td>
       <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6">${sym}${amt.toFixed(dec)}${amtTHB!==null&&e.currency!=='THB'?`<br><span style="font-size:0.7rem;color:#aaa">≈฿${amtTHB.toFixed(2)}</span>`:''}</td>
       <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6">${esc(e.payer||'—')}</td>
       <td style="padding:0.45rem 0.4rem;border-bottom:1px solid #EDE7F6;font-size:0.78rem;color:#8674A3">${esc(splitDesc)}</td>
@@ -1789,11 +1872,66 @@ function loadScript(src) {
 }
 
 /* ══════════════════════════════════════════
-   SHARE (jsonbin.io — unchanged logic)
+   SHARE
 ══════════════════════════════════════════ */
 function shareTrip() { showShareModal(); }
 function showShareModal() { document.getElementById('share-modal').style.display='flex'; }
-function hideShareModal() { document.getElementById('share-modal').style.display='none'; }
+function hideShareModal() {
+  document.getElementById('share-modal').style.display='none';
+  document.getElementById('quick-share-row').style.display='none';
+}
+
+function tripPayload() {
+  return {
+    p: state.people,
+    e: state.expenses.map(e=>({d:e.desc,a:e.amount,dt:e.date,cur:e.currency,cr:e.currencyRate,py:e.payer,sm:e.splitMode,sw:e.splitWith,ca:e.customAmounts,cat:e.category||''})),
+    tn: state.tripName, ts: state.tripDateStart, te: state.tripDateEnd
+  };
+}
+
+function payloadToState(r) {
+  return migrateState({
+    people: r.p||[],
+    expenses: (r.e||[]).map((x,i)=>({
+      id: Date.now()+i, desc:x.d||'', date:x.dt||'', amount:x.a||'',
+      currency:x.cur||'THB', currencyRate:x.cr!==undefined?x.cr:1,
+      payer:x.py||'', splitMode:x.sm||'equal',
+      splitWith:x.sw||[], customAmounts:x.ca||{}, category:x.cat||''
+    })),
+    tripName:r.tn||'', tripDateStart:r.ts||'', tripDateEnd:r.te||''
+  });
+}
+
+async function encodeTrip() {
+  const json = JSON.stringify(tripPayload());
+  const stream = new Blob([json]).stream().pipeThrough(new CompressionStream('gzip'));
+  const buf = await new Response(stream).arrayBuffer();
+  const bytes = new Uint8Array(buf);
+  let bin = '';
+  for (let i = 0; i < bytes.length; i += 8192) bin += String.fromCharCode(...bytes.subarray(i, i+8192));
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+}
+
+async function decodeTrip(b64) {
+  const bin = atob(b64.replace(/-/g,'+').replace(/_/g,'/'));
+  const bytes = Uint8Array.from(bin, c=>c.charCodeAt(0));
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return JSON.parse(await new Response(stream).text());
+}
+
+async function copyShareLink() {
+  const btn = document.getElementById('quick-share-btn');
+  const urlEl = document.getElementById('quick-share-url');
+  btn.disabled = true; btn.textContent = 'Building…';
+  try {
+    const d = await encodeTrip();
+    const url = window.location.href.split('?')[0] + '?d=' + d;
+    urlEl.textContent = url;
+    document.getElementById('quick-share-row').style.display = 'flex';
+    copyText(url, 'Link copied!');
+  } catch(err) { showToast('Could not build link.'); }
+  btn.disabled = false; btn.textContent = 'Copy link';
+}
 
 async function doShare() {
   const btn=document.getElementById('share-btn-inner');
@@ -1801,11 +1939,7 @@ async function doShare() {
   const resultEl=document.getElementById('share-result');
   resultEl.innerHTML='';
 
-  const payload={
-    p:state.people,
-    e:state.expenses.map(e=>({d:e.desc,a:e.amount,dt:e.date,cur:e.currency,cr:e.currencyRate,py:e.payer,sm:e.splitMode,sw:e.splitWith,ca:e.customAmounts})),
-    tn:state.tripName, ts:state.tripDateStart, te:state.tripDateEnd
-  };
+  const payload=tripPayload();
 
   try {
     const res=await fetch('https://api.jsonbin.io/v3/b',{
@@ -1836,7 +1970,7 @@ async function doShare() {
   } catch(err) {
     resultEl.innerHTML=`<p style="color:var(--negative);font-size:0.84rem">⚠️ Could not save. Check your connection.<br><small>${esc(err.message)}</small></p>`;
   }
-  btn.disabled=false; btn.textContent='Create share link';
+  btn.disabled=false; btn.textContent='Save & get ID';
 }
 
 async function loadFromId() {
@@ -1849,17 +1983,7 @@ async function loadFromId() {
     const res=await fetch('https://api.jsonbin.io/v3/b/'+id+'/latest');
     if(!res.ok) throw new Error('HTTP '+res.status);
     const data=await res.json();
-    const r=data.record;
-    state=migrateState({
-      people:r.p||[],
-      expenses:(r.e||[]).map((x,i)=>({
-        id:Date.now()+i, desc:x.d||'', date:x.dt||'', amount:x.a||'',
-        currency:x.cur||'THB', currencyRate:x.cr!==undefined?x.cr:1,
-        payer:x.py||'', splitMode:x.sm||'equal',
-        splitWith:x.sw||[], customAmounts:x.ca||{}
-      })),
-      tripName:r.tn||'', tripDateStart:r.ts||'', tripDateEnd:r.te||''
-    });
+    state=payloadToState(data.record);
     save();
     syncTripInfoUI();
     renderPeople(); renderExpenses(); renderSummary();
@@ -1871,23 +1995,23 @@ async function loadFromId() {
 
 async function tryLoadFromUrl() {
   const params=new URLSearchParams(window.location.search);
+
+  const d=params.get('d');
+  if(d) {
+    try {
+      const r=await decodeTrip(d);
+      state=payloadToState(r);
+      return true;
+    } catch(e){ return false; }
+  }
+
   const bin=params.get('bin');
   if(!bin) return false;
   try {
     const res=await fetch('https://api.jsonbin.io/v3/b/'+bin+'/latest');
     if(!res.ok) return false;
     const data=await res.json();
-    const r=data.record;
-    state=migrateState({
-      people:r.p||[],
-      expenses:(r.e||[]).map((x,i)=>({
-        id:Date.now()+i, desc:x.d||'', date:x.dt||'', amount:x.a||'',
-        currency:x.cur||'THB', currencyRate:x.cr!==undefined?x.cr:1,
-        payer:x.py||'', splitMode:x.sm||'equal',
-        splitWith:x.sw||[], customAmounts:x.ca||{}
-      })),
-      tripName:r.tn||'', tripDateStart:r.ts||'', tripDateEnd:r.te||''
-    });
+    state=payloadToState(data.record);
     return true;
   } catch(e){ return false; }
 }
